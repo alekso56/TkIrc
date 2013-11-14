@@ -2,9 +2,13 @@ TkIrc
 =====
 
 ircbotbridge for turtlekingdom
-: planned features;
+: commands so far;
 * !set (commandname) (reply)
 * !unset (commandname)
 * !(commandname)
-* !status (reply with Login; color,Session; color.)
-* !update
+* !status (reply with "all services OK" or name of services that are down.)
+* !players (reply with list of players online or "NONE")
+* !c (minecraftcommand)
+
+:Planned features;
+* save commands somewhere
