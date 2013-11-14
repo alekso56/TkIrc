@@ -1,8 +1,5 @@
 package alekso56.TkIrc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;

@@ -1,7 +1,5 @@
 package alekso56.TkIrc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 

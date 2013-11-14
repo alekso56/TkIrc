@@ -11,4 +11,4 @@ ircbotbridge for turtlekingdom
 * !c (minecraftcommand)
 
 :Planned features;
-* save commands somewhere
+* just optimize the damn thing!

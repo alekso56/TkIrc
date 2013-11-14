@@ -1,15 +1,11 @@
 package alekso56.TkIrc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import java.util.EnumSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.TickType;
-//~--- JDK imports ------------------------------------------------------------
 
 public class Tkeys extends KeyBindingRegistry.KeyHandler {
     public Tkeys() {

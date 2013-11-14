@@ -1,6 +1,7 @@
 package alekso56.TkIrc;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -64,18 +65,24 @@ public class Config
     cKey = config.get("Channel", "Key", "").getString();
     ConfigCategory cmdcat = config.getCategory("deathmessages");
     Map<String,Property> cmdmap = cmdcat.getValues();
-
+    
     if (cmdmap.isEmpty()) {
-      System.out.println("cmdmap is empty...");
+     // System.out.println("cmdmap is empty...");
       config.get("deathmessages", "death.attack.bee.end", "%PLAYER% got stung.");
     }
     for (Map.Entry i : cmdmap.entrySet()) {
       String k = (String)i.getKey();
       Property v = (Property)i.getValue();
       mDeathMessages.put(k, v.getString());
-      System.out.println("Added '" + k + "' with value '" + v.getString() + "'.");
+      //System.out.println("Added '" + k + "' with value '" + v.getString() + "'.");
     }
-
+        ConfigCategory opmap = config.getCategory("OPs");
+    	TkIrc.ops.add(config.get("OPs", "alekso56",1).getName());
+    	TkIrc.ops.add(config.get("OPs", "Cruor",2).getName());
+    	TkIrc.ops.add(config.get("OPs", "Odd",3).getName());
+    	TkIrc.ops.add(config.get("OPs", "SafPlusPlus",4).getName());
+    	TkIrc.ops.add(config.get("OPs", "LSBvC",5).getName());
+    	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName());
     
     eDeath = config.get("Events", "Deaths", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
     eJoinMC = config.get("Events", "minecraft_joins", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
@@ -99,7 +106,7 @@ public class Config
     config.get("Twitch", "Username", "").comment = "Your Twitch username goes here";
     tTargetUser = config.get("Twitch", "Username", "").getString().isEmpty() ? tYourUser : config.get("Twitch", "Streamer_Username", "").getString();
     config.get("Twitch", "Streamer_Username", "").comment = "Place the name of the streamer whose chat you wish to join here";
-
+    
     if ((!tYourUser.isEmpty()) && (!tKey.isEmpty()))
     {
       sHost = tTargetUser.toLowerCase() + ".jtvirc.com";

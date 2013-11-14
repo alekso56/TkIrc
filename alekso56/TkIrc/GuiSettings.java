@@ -1,11 +1,8 @@
 package alekso56.TkIrc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-//~--- JDK imports ------------------------------------------------------------
+
 
 public class GuiSettings extends GuiScreen {
     protected Integer    wX = Integer.valueOf(230);
