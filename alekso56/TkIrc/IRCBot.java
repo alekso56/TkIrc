@@ -77,6 +77,11 @@ public class IRCBot extends IRCLib {
 		if (m.equals(Config.prefixforirccommands + "status")) {
 			TkIrc.toIrc.sendMessage(d, TkIrc.toIrc.getrawurle());
 		}
+		if (m.equals(Config.prefixforirccommands + "help")) {
+		String msgb = "Prefix: "+Config.prefixforirccommands+" : help,players,c <mcCommand>,status,tps <t or worldNum>,set <cName> <reply>,unset <cName>,";
+		for(int i=0; i<TkIrc.commands.size(); i++){msgb = msgb+TkIrc.commands.keySet().iterator().next();}
+			TkIrc.toIrc.sendMessage(d, msgb);
+		}
 		if (m.startsWith(Config.prefixforirccommands + "tps")) {
 			StringBuilder out = new StringBuilder();
 			NumberFormat percentFormatter = NumberFormat.getPercentInstance();
