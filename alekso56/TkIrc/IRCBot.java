@@ -2,6 +2,7 @@ package alekso56.TkIrc;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.Iterator;
 
 import net.minecraft.network.packet.Packet3Chat;
 import net.minecraft.server.MinecraftServer;
@@ -24,7 +25,7 @@ public class IRCBot extends IRCLib {
 		return time / par1ArrayOfLong.length;
 	}
 
-	public boolean isAuthed(String username) {
+	public boolean isAuthed(String username,String d) {
 		if (TkIrc.ops.contains(username.toLowerCase())) {
 			String authnum = "0";
 			try {
@@ -38,6 +39,10 @@ public class IRCBot extends IRCLib {
 			}
 			if (authnum.equals("3")) {
 				return true;
+			}
+			else {
+				// user has failed auth
+				TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
 			}
 		}
 		return false;
@@ -59,18 +64,13 @@ public class IRCBot extends IRCLib {
 			TkIrc.toIrc.sendMessage(d, lPlayers);
 			return;
 		}
-		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c")&& m.length() >= Config.prefixforirccommands.length() + 2) {
-				if (isAuthed(n)) {
+		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c")&&isAuthed(n,d)&&m.length() >= Config.prefixforirccommands.length() + 2 ) {
 					String out = MinecraftServer.getServer().executeCommand(
 							m.substring(3));
 					if (out.startsWith(Config.prefixforirccommands)) {
 						out = out.substring(Config.prefixforirccommands.length()+1);
 					}
 					TkIrc.toIrc.sendMessage(d, out);
-				} else {
-					// user has failed auth
-					TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: auth error");
-				}
 			return;
 		}
 
@@ -78,8 +78,11 @@ public class IRCBot extends IRCLib {
 			TkIrc.toIrc.sendMessage(d, TkIrc.toIrc.getrawurle());
 		}
 		if (m.equals(Config.prefixforirccommands + "help")) {
-		String msgb = "Prefix: "+Config.prefixforirccommands+" : help,players,c <mcCommand>,status,tps <t or worldNum>,set <cName> <reply>,unset <cName>,";
-		for(int i=0; i<TkIrc.commands.size(); i++){msgb = msgb+TkIrc.commands.keySet().iterator().next();}
+		String msgb = "Prefix: "+Config.prefixforirccommands+" : help|players|c <mcCommand>|status|tps <t or worldNum>|set <cName> <reply>| unset <cName>|";
+		Iterator<String> commands = TkIrc.commands.keySet().iterator();
+		while (commands.hasNext()){
+			 msgb = msgb+commands.next()+"| ";
+		    }
 			TkIrc.toIrc.sendMessage(d, msgb);
 		}
 		if (m.startsWith(Config.prefixforirccommands + "tps")) {
@@ -142,7 +145,7 @@ public class IRCBot extends IRCLib {
 						Config.prefixforirccommands.length()).toLowerCase()));
 			}
 			if (m.startsWith(Config.prefixforirccommands + "unset")
-					&& commandsplit[1] != null && isAuthed(n)) {
+					&& commandsplit[1] != null && isAuthed(n,d)) {
 				if (TkIrc.commands.get(commandsplit[1]) != null) {
 					TkIrc.commands.remove(commandsplit[1]);
 					TkIrc.toIrc.sendMessage(d, "removed " + commandsplit[1]);
@@ -154,7 +157,7 @@ public class IRCBot extends IRCLib {
 				return;
 			}
 			if (m.startsWith(Config.prefixforirccommands + "set")
-					&& commandsplit[2] != null && commandsplit[1] != null && isAuthed(n)) {
+					&& commandsplit[2] != null && commandsplit[1] != null && isAuthed(n,d)) {
 				TkIrc.commands.put(commandsplit[1].toLowerCase(),
 						commandsplit[2]);
 				TkIrc.toIrc.sendMessage(d, "Set " + commandsplit[1] + " as "
@@ -260,11 +263,6 @@ public class IRCBot extends IRCLib {
 		if (m.split(" ")[0].equals("SOURCE")) {
 			sendCTCPReply(n,
 					"SOURCE wait, i got this... a source is some kind of document right?");
-		}
-
-		if (m.split(" ")[0].equals("PING")) {
-			sendCTCPReply(n,
-					"PING Pong, wait... was i not supposed to send pong?");
 		}
 
 		if (m.split(" ")[0].equals("PAGE")) {

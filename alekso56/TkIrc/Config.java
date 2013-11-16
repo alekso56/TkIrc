@@ -69,6 +69,7 @@ public class Config
     if (cmdmap.isEmpty()) {
      // System.out.println("cmdmap is empty...");
       config.get("deathmessages", "death.attack.bee.end", "%PLAYER% got stung.");
+      config.get("deathmessages", "death.attack.train", "%PLAYER% got hit by a train.");
     }
     for (Map.Entry i : cmdmap.entrySet()) {
       String k = (String)i.getKey();
@@ -83,6 +84,8 @@ public class Config
     	TkIrc.ops.add(config.get("OPs", "SafPlusPlus",4).getName());
     	TkIrc.ops.add(config.get("OPs", "LSBvC",5).getName());
     	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName());
+    	TkIrc.ops.add(config.get("OPs", "Odd",7).getName());
+    	TkIrc.ops.add(config.get("OPs", "LSBvC_",8).getName());
     
     eDeath = config.get("Events", "Deaths", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
     eJoinMC = config.get("Events", "minecraft_joins", gameType == Type.SMP).getBoolean(gameType == Type.SMP);

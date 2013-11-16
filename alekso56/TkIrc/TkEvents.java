@@ -55,7 +55,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
 
         if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(event.username)) {
             username = username.equals(event.username)
-                       ? "�" + Config.opColor + event.username + "�r"
+                       ? "§" + Config.opColor + event.username + "§r"
                        : username;
         }
     }

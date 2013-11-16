@@ -22,10 +22,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.0", dependencies = "required-after:Forge@[9.11.1.633,]")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.1", dependencies = "required-after:Forge@[9.11.1.633,]")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
 public class TkIrc {
-	public static final String VERSION = "2.0";
+	public static final String VERSION = "2.1";
 	static int chatTo = 0;
 	protected static Configuration config;
 	public static IRCLib toIrc;
