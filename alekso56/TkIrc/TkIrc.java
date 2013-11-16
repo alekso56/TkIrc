@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
 import alekso56.TkIrc.irclib.IRCLib;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -98,9 +97,9 @@ public class TkIrc {
 
 	public static String dePing(String sPlayer) {
 		if (Config.depinger && sPlayer.length() >= 2) {
-			String Player = sPlayer.substring(0, 2)
+			String Player = sPlayer.substring(0,2)
 					+ Character.toString('\u200B')
-					+ sPlayer.substring(2, sPlayer.length()-2);
+					+ sPlayer.substring(2);
 			return Player;
 		} else {
 			return sPlayer;

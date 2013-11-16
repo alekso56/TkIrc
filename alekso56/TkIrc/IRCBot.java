@@ -76,6 +76,7 @@ public class IRCBot extends IRCLib {
 
 		if (m.equals(Config.prefixforirccommands + "status")) {
 			TkIrc.toIrc.sendMessage(d, TkIrc.toIrc.getrawurle());
+			return;
 		}
 		if (m.equals(Config.prefixforirccommands + "help")) {
 		String msgb = "Prefix: "+Config.prefixforirccommands+" : help|players|c <mcCommand>|status|tps <t or worldNum>|set <cName> <reply>| unset <cName>|";
@@ -83,7 +84,8 @@ public class IRCBot extends IRCLib {
 		while (commands.hasNext()){
 			 msgb = msgb+commands.next()+"| ";
 		    }
-			TkIrc.toIrc.sendMessage(d, msgb);
+		 TkIrc.toIrc.sendMessage(d, msgb);
+		 return;
 		}
 		if (m.startsWith(Config.prefixforirccommands + "tps")) {
 			StringBuilder out = new StringBuilder();
@@ -143,6 +145,7 @@ public class IRCBot extends IRCLib {
 				// System.out.println("valid command "+m.substring(Config.prefixforirccommands.length()));
 				TkIrc.toIrc.sendMessage(d, TkIrc.commands.get(m.substring(
 						Config.prefixforirccommands.length()).toLowerCase()));
+				return;
 			}
 			if (m.startsWith(Config.prefixforirccommands + "unset")
 					&& commandsplit[1] != null && isAuthed(n,d)) {
@@ -163,17 +166,17 @@ public class IRCBot extends IRCLib {
 				TkIrc.toIrc.sendMessage(d, "Set " + commandsplit[1] + " as "
 						+ commandsplit[2]);
 				TkIrc.toIrc.savecmd();
+				return;
 			}
 		} catch (IndexOutOfBoundsException e) {
 			TkIrc.toIrc.sendMessage(d, "Invalid command format");
+			return;
 		}
 		n = colorNick(n, u, h);
 		if (d.equals(this.sNick)) {
 			mcMessage("[IRC PM] <" + n + "> ", m);
 		} else {
-			String sPrefix = Config.pIngameMSG.replaceAll("%c", d).replaceAll(
-					"%n", n)
-					+ " ";
+			String sPrefix = Config.pIngameMSG.replaceAll("%c", d).replaceAll("%n", n)+ " ";
 			mcMessage(sPrefix, m);
 		}
 	}
@@ -181,9 +184,7 @@ public class IRCBot extends IRCLib {
 	public void onAction(String n, String u, String h, String d, String m) {
 		n = colorNick(n, u, h);
 
-		String sPrefix = Config.pIngameAction.replaceAll("%c", d).replaceAll(
-				"%n", n)
-				+ " ";
+		String sPrefix = Config.pIngameAction.replaceAll("%c",d).replaceAll("%n", n)+" ";
 
 		mcMessage("", sPrefix + m);
 	}
@@ -319,11 +320,7 @@ public class IRCBot extends IRCLib {
 	}
 
 	public void mcMessage(String m) {
-		if (m == null) {
-			return;
-		}
-
-		if (m.startsWith("$$")) {
+		if (m.startsWith("$$")||m == null) {
 			return;
 		}
 
@@ -344,7 +341,7 @@ public class IRCBot extends IRCLib {
 		}
 	}
 
-	public String stripColors(String message) {
+	public static String stripColors(String message) {
 		message = message.replaceAll(Character.toString('Â'), "");
 		message = message.replaceAll("§([^\\d+r])", "$1");
 		message = message.replaceAll("(" + Character.toString('\003')
@@ -386,10 +383,6 @@ public class IRCBot extends IRCLib {
 	}
 
 	static String colorNick(String n) {
-		if (n.toLowerCase().equals("alekso56")) {
-			return Character.toString('\003') + "05" + n
-					+ Character.toString('\003');
-		}
 		return n;
 	}
 
