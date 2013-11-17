@@ -6,7 +6,6 @@ import java.util.EnumSet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 
@@ -17,20 +16,14 @@ import cpw.mods.fml.common.TickType;
 //~--- JDK imports ------------------------------------------------------------
 
 public class TickHandler implements ITickHandler {
-    public void tickStart(EnumSet type, Object[] tickData) {}
+	
+	public void tickStart(EnumSet<TickType> type, Object... tickData) {
+	}
 
-    public void tickEnd(EnumSet type, Object[] tickData) {
+    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
         if (type.equals(EnumSet.of(TickType.RENDER))) {
             onRenderTick();
-        } else if (type.equals(EnumSet.of(TickType.CLIENT))) {
-            GuiScreen guiscreen = Minecraft.getMinecraft().currentScreen;
-
-            if (guiscreen != null) {
-                onTickInGUI(guiscreen);
-            } else {
-                onTickInGame();
-            }
-        }
+        } 
     }
 
     public EnumSet ticks() {
@@ -53,12 +46,12 @@ public class TickHandler implements ITickHandler {
 
             switch (TkIrc.chatTo) {
             case -1 :
-                chattingTo = "Minecraft";
+                chattingTo = "MC";
 
                 break;
 
             case 0 :
-                chattingTo = "Minecraft, " + Config.cName;
+                chattingTo = "MC, " + Config.cName;
 
                 break;
 
@@ -72,15 +65,6 @@ public class TickHandler implements ITickHandler {
             mc.fontRenderer.drawString("Chatting To: " + chattingTo, sX.intValue(), sY.intValue(), 16777215);
         }
     }
-
-    public void onTickInGUI(GuiScreen guiscreen) {
-        if (((guiscreen instanceof GuiChat)) && (TkIrc.chatTo == 1) && (!(guiscreen instanceof GuiIRCChat))) {
-            Minecraft.getMinecraft().displayGuiScreen((GuiScreen) null);
-            Minecraft.getMinecraft().displayGuiScreen(new GuiIRCChat());
-        }
-    }
-
-    public void onTickInGame() {}
 
     protected void drawGradientRect(int par1, int par2, int par3, int par4, int par5, int par6) {
         float var7  = (par5 >> 24 & 0xFF) / 255.0F;

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import alekso56.TkIrc.irclib.IRCLib;
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
@@ -21,10 +20,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.1", dependencies = "required-after:Forge@[9.11.1.633,]")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.2", dependencies = "required-after:Forge@[9.11.1.633,]")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
 public class TkIrc {
-	public static final String VERSION = "2.1";
 	static int chatTo = 0;
 	protected static Configuration config;
 	public static IRCLib toIrc;
@@ -56,7 +54,6 @@ public class TkIrc {
 
 		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
 			TickRegistry.registerTickHandler(new TickHandler(), Side.CLIENT);
-			KeyBindingRegistry.registerKeyBinding(new Tkeys());
 		}
 	}
 

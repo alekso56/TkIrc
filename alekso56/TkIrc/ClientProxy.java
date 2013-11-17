@@ -1,11 +1,8 @@
 package alekso56.TkIrc;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 
 public class ClientProxy extends CommonProxy {
-    public static KeyBinding tkbind = new KeyBinding("TkIrc", 50);
-    public static KeyBinding tktoggle  = new KeyBinding("TkIrctoggle", 61);
 
     public String botUser() {
         return "tkclient";

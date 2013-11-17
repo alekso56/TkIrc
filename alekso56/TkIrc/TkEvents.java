@@ -1,8 +1,5 @@
 package alekso56.TkIrc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetLoginHandler;
@@ -18,7 +15,6 @@ import cpw.mods.fml.common.IPlayerTracker;
 import cpw.mods.fml.common.network.IChatListener;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.Player;
-//~--- JDK imports ------------------------------------------------------------
 
 public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandler {
     @ForgeSubscribe
