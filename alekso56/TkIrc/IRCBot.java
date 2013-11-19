@@ -41,7 +41,9 @@ public class IRCBot extends IRCLib {
 				return true;
 			}
 		}
-		TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
+		else{
+		 TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
+		}
 		return false;
 	}
 
@@ -338,7 +340,7 @@ public class IRCBot extends IRCLib {
 	}
 
 	public static String stripColors(String message) {
-		message = message.replaceAll(Character.toString('Â'), "");
+		message = message.replaceAll(Character.toString('�'), "");
 		message = message.replaceAll("§([^\\d+r])", "$1");
 		message = message.replaceAll("(" + Character.toString('\003')
 				+ "\\d{2}),\\d{1,2}", "§1");
