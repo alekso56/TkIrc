@@ -40,11 +40,8 @@ public class IRCBot extends IRCLib {
 			if (authnum.equals("3")) {
 				return true;
 			}
-			else {
-				// user has failed auth
-				TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
-			}
 		}
+		TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
 		return false;
 	}
 
@@ -65,8 +62,7 @@ public class IRCBot extends IRCLib {
 			return;
 		}
 		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c")&&isAuthed(n,d)&&m.length() >= Config.prefixforirccommands.length() + 2 ) {
-					String out = MinecraftServer.getServer().executeCommand(
-							m.substring(3));
+					String out = MinecraftServer.getServer().executeCommand(m.substring(3));
 					if (out.startsWith(Config.prefixforirccommands)) {
 						out = out.substring(Config.prefixforirccommands.length()+1);
 					}
@@ -79,7 +75,7 @@ public class IRCBot extends IRCLib {
 			return;
 		}
 		if (m.equals(Config.prefixforirccommands + "help")) {
-		String msgb = "Prefix: "+Config.prefixforirccommands+" : help|players|c <mcCommand>|status|tps <t or worldNum>|set <cName> <reply>| unset <cName>|";
+		String msgb = "Prefix: "+Config.prefixforirccommands+" : help | players | c <mcCommand>| status| tps <t or worldNum>| set <cName> <reply>| unset <cName>|";
 		Iterator<String> commands = TkIrc.commands.keySet().iterator();
 		while (commands.hasNext()){
 			 msgb = msgb+commands.next()+"| ";

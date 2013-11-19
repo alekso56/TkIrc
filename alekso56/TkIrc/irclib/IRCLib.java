@@ -435,7 +435,7 @@ public class IRCLib extends Thread {
 			s.append("skins");
 		}
 		if (s.length() != 0) {
-			return s.toString();
+			return "These services are brok; "+s.toString();
 		} else {
 			return "All services are OK!";
 		}
