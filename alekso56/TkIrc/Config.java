@@ -78,12 +78,11 @@ public class Config
     }
     	TkIrc.ops.add(config.get("OPs", "alekso56",1).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Cruor",2).getName().toLowerCase());
+    	TkIrc.ops.add(config.get("OPs", "Cruor_",2).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Odd",3).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "SafPlusPlus",4).getName().toLowerCase());
-    	TkIrc.ops.add(config.get("OPs", "LSBvC",5).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Odd",7).getName().toLowerCase());
-    	TkIrc.ops.add(config.get("OPs", "LSBvC_",8).getName().toLowerCase());
     
     eDeath = config.get("Events", "Deaths", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
     eJoinMC = config.get("Events", "minecraft_joins", gameType == Type.SMP).getBoolean(gameType == Type.SMP);

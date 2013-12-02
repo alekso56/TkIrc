@@ -31,13 +31,14 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
             String dmsg = StatCollector.translateToLocalFormatted("death.attack." + event.source.damageType,
                               new Object[] { event.entityLiving.getEntityName(),
                                              s });
+            
             String cdmsg = (String) Config.mDeathMessages.get("death." + event.source.damageType);
 
            // System.out.println(event.source.damageType);
 
             if (cdmsg != null) {
                 dmsg = cdmsg;
-                dmsg = dmsg.replaceAll("%PLAYER%", event.entityLiving.getEntityName());
+                dmsg = dmsg.replaceAll("%PLAYER%", TkIrc.dePing(event.entityLiving.getEntityName()));
                 dmsg = dmsg.replaceAll("%SOURCE%", s);
             }
 
@@ -66,17 +67,13 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
                 username = TkIrc.dePing(username);
                 String sPrefix  = Config.pIRCAction.replaceAll("%n", username) + " ";
 
-                if (TkIrc.chatTo >= 0) {
                     TkIrc.toIrc.sendMessage(Config.cName, sPrefix+ message.message.substring(4));
-                }
         } else if (!message.message.startsWith("$$")) {
             String username = IRCBot.colorNick(handler.getPlayer().username);
             username = TkIrc.dePing(username);
             String sPrefix  = Config.pIRCMSG.replaceAll("%n", username) + " ";
 
-            if (TkIrc.chatTo >= 0) {
                 TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
-            }
         }
 
         return message;
@@ -92,15 +89,11 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
 
       if (aMessage[0].matches("^<" + handler.getPlayer().username + ">$"))
       {
-        if (TkIrc.chatTo >= 0) {
           TkIrc.toIrc.sendMessage(Config.cName, aMessage[1]);
-        }
       }
       else if ((aMessage[0].matches("^\\*$")) && (aMessage[1].split(" ", 2)[0].matches(handler.getPlayer().username)))
       {
-        if (TkIrc.chatTo >= 0) {
           TkIrc.toIrc.sendAction(Config.cName, aMessage[1].split(" ", 2)[1]);
-        }
       }
 
       return message;
@@ -113,7 +106,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
         }
 
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* "+ TkIrc.dePing(player.username) +" has joined the game");
+            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* "+ TkIrc.dePing(player.username) +" has joined the game");
         }
     }
 
@@ -126,7 +119,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
         }
 
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* " + TkIrc.dePing(player.username) + " has left the game");
+            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* " + TkIrc.dePing(player.username) + " has left the game");
         }
     }
 

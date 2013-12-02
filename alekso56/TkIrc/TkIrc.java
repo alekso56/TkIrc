@@ -20,10 +20,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.2", dependencies = "required-after:Forge@[9.11.1.633,]")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.3", dependencies = "required-after:Forge@[9.11.1.633,]")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
 public class TkIrc {
-	static int chatTo = 0;
 	protected static Configuration config;
 	public static IRCLib toIrc;
 	public static HashMap<String, String> commands = new HashMap<String, String>();
@@ -51,10 +50,6 @@ public class TkIrc {
 		GameRegistry.registerPlayerTracker(eHandler);
 		NetworkRegistry.instance().registerChatListener(eHandler);
 		NetworkRegistry.instance().registerConnectionHandler(eHandler);
-
-		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-			TickRegistry.registerTickHandler(new TickHandler(), Side.CLIENT);
-		}
 	}
 
 	@Mod.EventHandler
@@ -100,14 +95,6 @@ public class TkIrc {
 			return Player;
 		} else {
 			return sPlayer;
-		}
-	}
-
-	static void toggleChat() {
-		if (chatTo == 1) {
-			chatTo = -1;
-		} else {
-			chatTo += 1;
 		}
 	}
 }

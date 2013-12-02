@@ -10,7 +10,7 @@ import net.minecraft.util.ChatMessageComponent;
 import net.minecraftforge.common.DimensionManager;
 import alekso56.TkIrc.irclib.IRCLib;
 
-public class IRCBot extends IRCLib {
+public class IRCBot extends IRCLib implements API {
 	private double timeFormat(long[] par1ArrayOfLong) {
 		long time = 0L;
 		long[] var4 = par1ArrayOfLong;
@@ -41,14 +41,13 @@ public class IRCBot extends IRCLib {
 				return true;
 			}
 		}
-		else{
+		else if (d != null){
 		 TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
 		}
 		return false;
 	}
 
 	public void onMessage(String n, String u, String h, String d, String m) {
-
 		if ((m.equals(Config.prefixforirccommands + "players"))
 				&& ((Config.gameType == Config.Type.SMP) || (Config.gameType == Config.Type.SMPLAN))) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
@@ -63,7 +62,7 @@ public class IRCBot extends IRCLib {
 			TkIrc.toIrc.sendMessage(d, lPlayers);
 			return;
 		}
-		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c")&&isAuthed(n,d)&&m.length() >= Config.prefixforirccommands.length() + 2 ) {
+		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c ")&&isAuthed(n,d)&&m.length() >= Config.prefixforirccommands.length() + 2 ) {
 					String out = MinecraftServer.getServer().executeCommand(m.substring(3));
 					if (out.startsWith(Config.prefixforirccommands)) {
 						out = out.substring(Config.prefixforirccommands.length()+1);
@@ -77,10 +76,13 @@ public class IRCBot extends IRCLib {
 			return;
 		}
 		if (m.equals(Config.prefixforirccommands + "help")) {
-		String msgb = "Prefix: "+Config.prefixforirccommands+" : help | players | c <mcCommand>| status| tps <t or worldNum>| set <cName> <reply>| unset <cName>|";
+		String msgb = "Prefix: "+Config.prefixforirccommands+" : help| players| status| tps <t or worldNum>| ";
+		if (isAuthed(n, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| ";}
 		Iterator<String> commands = TkIrc.commands.keySet().iterator();
 		while (commands.hasNext()){
-			 msgb = msgb+commands.next()+"| ";
+			String current = commands.next();
+			if(TkIrc.ops.contains(current.toLowerCase())){current = TkIrc.dePing(current.toLowerCase());}
+			 msgb = msgb+current+"| ";
 		    }
 		 TkIrc.toIrc.sendMessage(d, msgb);
 		 return;
@@ -385,7 +387,7 @@ public class IRCBot extends IRCLib {
 	}
 
 	static String colorNick(String n, String u, String h) {
-		if (n.toLowerCase().equals("alekso56")) {
+		if (TkIrc.ops.contains(n.toLowerCase())) {
 			return "§4" + n + "§r";
 		} else {
 			return n;

@@ -29,8 +29,8 @@ public class IRCLib extends Thread {
 	protected List lChannel = new ArrayList();
 	protected String sServer;
 	protected String sNick;
-	protected String sName = "sdIRC";
-	protected String sUser = "sdIRC";
+	protected String sName = "tkIRC";
+	protected String sUser = "tkIRC";
 	protected String sKey = "";
 	protected String SASLUser = "";
 	protected String SASLPass = "";
@@ -406,14 +406,12 @@ public class IRCLib extends Thread {
 		jsonObject = gson.fromJson(json, listType);
 		StringBuilder s = new StringBuilder();
 		if (jsonObject.get(0).get("minecraft.net").equalsIgnoreCase("green")) {
-			// System.out.println("minecraft.net is online.");
 		} else {
 			// mc webpage is borked
 			s.append("mcWeb,");
 		}
 		if (jsonObject.get(1).get("login.minecraft.net")
 				.equalsIgnoreCase("green")) {
-			// System.out.println("login.minecraft.net is online.");
 		} else {
 			// login is borked
 			s.append("login,");
@@ -421,7 +419,6 @@ public class IRCLib extends Thread {
 
 		if (jsonObject.get(2).get("session.minecraft.net")
 				.equalsIgnoreCase("green")) {
-			// System.out.println("session.minecraft.net is online.");
 		} else {
 			// sessionmc is brok
 			s.append("session,");
@@ -429,7 +426,6 @@ public class IRCLib extends Thread {
 
 		if (jsonObject.get(5).get("skins.minecraft.net")
 				.equalsIgnoreCase("green")) {
-			// System.out.println("skins.minecraft.net is online.");
 		} else {
 			// skins are borked
 			s.append("skins");
