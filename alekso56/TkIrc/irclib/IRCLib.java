@@ -317,6 +317,10 @@ public class IRCLib extends Thread {
 	public void sendAction(String d, String m) {
 		sendCTCP(d, "ACTION " + m);
 	}
+	
+	public void sendNotice(String usr, String msg) {
+		sendRaw("NOTICE " + usr+" "+msg);
+	}
 
 	public void sendCTCP(String d, String m) {
 		sendRaw("PRIVMSG " + d + " :" + Character.toString('\001') + m

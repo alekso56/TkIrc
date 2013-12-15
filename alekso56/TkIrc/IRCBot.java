@@ -41,7 +41,17 @@ public class IRCBot extends IRCLib implements API {
 				return true;
 			}
 		}
-		else if (d != null){
+		/*try {
+			TkIrc.toIrc.sendRaw("NAMES "+d);
+			String response = TkIrc.toIrc.in.readLine();
+			System.out.println(response);
+			String[] parted = response.split(" ");
+			System.out.println(parted[6]);
+            
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		if (d != null){
 		 TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
 		}
 		return false;
@@ -76,15 +86,14 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 		if (m.equals(Config.prefixforirccommands + "help")) {
-		String msgb = "Prefix: "+Config.prefixforirccommands+" : help| players| status| tps <t or worldNum>| ";
-		if (isAuthed(n, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| ";}
+		String msgb = "Prefix:_"+Config.prefixforirccommands+"_:_help|_players|_status|_tps_<t_or_worldNum>|_";
+		if (isAuthed(n, null)){msgb = msgb+"set_<command>_<reply>|_unset_<command>|_c_<mcCommand>|_";}
 		Iterator<String> commands = TkIrc.commands.keySet().iterator();
 		while (commands.hasNext()){
 			String current = commands.next();
-			if(TkIrc.ops.contains(current.toLowerCase())){current = TkIrc.dePing(current.toLowerCase());}
-			 msgb = msgb+current+"| ";
+			 msgb = msgb+current+"|";
 		    }
-		 TkIrc.toIrc.sendMessage(d, msgb);
+		 TkIrc.toIrc.sendNotice(n, msgb);
 		 return;
 		}
 		if (m.startsWith(Config.prefixforirccommands + "tps")) {
