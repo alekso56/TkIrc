@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import alekso56.TkIrc.irclib.IRCLib;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
@@ -101,7 +103,7 @@ public class TkIrc {
 	        {
 	            comment = "Witty comment unavailable :(";
 	        }
-			
+			FMLLog.log("Minecraft-Server", Level.SEVERE, "%s", "This crash report has been saved to' in ForgeModLoader-server-0.log");;
 			File file1 = new File(new File(".", "crash-reports"), "crash-Fake-TKI-Crash-server.txt");
 			try {
 				if(file1.exists()){file1.delete();}
