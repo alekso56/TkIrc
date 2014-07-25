@@ -47,38 +47,21 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
     }
 
     @ForgeSubscribe
-    public void onSM(ServerChatEvent event) {
-        String username = IRCBot.colorNick(event.username, null, null);
-
-        if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(event.username)) {
-            username = username.equals(event.username)
-                       ? "§" + Config.opColor + event.username + "§r"
-                       : username;
-        }
-    }
-    public Packet3Chat serverChat(NetHandler handler, Packet3Chat message) {
-        if ((message.message.startsWith("/")) && (!message.message.startsWith("/me"))
-                && (!message.message.startsWith("$$"))) {
-            return message;
-        }
-
+    public void onSM(ServerChatEvent message) {
+        if(message.isCanceled()  && !message.message.startsWith("/me")){return;}
         if ((message.message.startsWith("/me")) && (message.message.length() >= 4)) {
-                String username = IRCBot.colorNick(handler.getPlayer().username);
+                String username = IRCBot.colorNick(message.username);
                 username = TkIrc.dePing(username);
                 String sPrefix  = Config.pIRCAction.replaceAll("%n", username) + " ";
-
-                    TkIrc.toIrc.sendMessage(Config.cName, sPrefix+ message.message.substring(4));
-        } else if (!message.message.startsWith("$$")) {
-            String username = IRCBot.colorNick(handler.getPlayer().username);
+                TkIrc.toIrc.sendMessage(Config.cName, sPrefix+ message.message.substring(4));
+        } else {
+            String username = IRCBot.colorNick(message.username);
             username = TkIrc.dePing(username);
             String sPrefix  = Config.pIRCMSG.replaceAll("%n", username) + " ";
 
                 TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
         }
-
-        return message;
     }
-
     public Packet3Chat clientChat(NetHandler handler, Packet3Chat message)
     {
       if (Config.gameType != Config.Type.SMPREMOTE) {
@@ -154,4 +137,8 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
     }
 
     public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
+
+	public Packet3Chat serverChat(NetHandler handler, Packet3Chat message) {
+		return message;
+	}
 }

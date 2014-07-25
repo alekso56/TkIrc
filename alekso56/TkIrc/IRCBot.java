@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Iterator;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.packet.Packet3Chat;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraftforge.common.DimensionManager;
@@ -41,65 +43,81 @@ public class IRCBot extends IRCLib implements API {
 				return true;
 			}
 		}
-		/*try {
-			TkIrc.toIrc.sendRaw("NAMES "+d);
+		try {
+			TkIrc.toIrc.sendRaw("names "+Config.cName);
 			String response = TkIrc.toIrc.in.readLine();
-			System.out.println(response);
 			String[] parted = response.split(" ");
-			System.out.println(parted[6]);
+			for (int curr = 0;curr<parted.length; curr++) {
+				if(parted[curr].startsWith("@") && parted[curr].contains(username)){
+					return true;
+				}
+			}
             
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 		if (d != null){
 		 TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
 		}
 		return false;
 	}
 
-	public void onMessage(String n, String u, String h, String d, String m) {
-		if ((m.equals(Config.prefixforirccommands + "players"))
+	public void onMessage(String usr, String u, String h, String nick, String m) {
+		if(!m.startsWith(Config.prefixforirccommands)){
+			usr = colorNick(usr, u, h);
+			if (nick.equals(this.sNick)) {
+				mcMessage(usr, m,true);
+			} else {
+				String sPrefix = Config.pIngameMSG.replaceAll("%c", nick).replaceAll("%n", usr)+ " ";
+				mcMessage(sPrefix, m,false);
+			}
+			return;
+		}
+		else{m = m.substring(Config.prefixforirccommands.length());}
+		
+		if (m.equals("players")
 				&& ((Config.gameType == Config.Type.SMP) || (Config.gameType == Config.Type.SMPLAN))) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
 			String lPlayers = aPlayers.length == 0 ? "None." : "";
 
 			for (String sPlayer : aPlayers) {
-				sPlayer = TkIrc.dePing(sPlayer);
-				lPlayers = lPlayers
-						+ ((lPlayers == "") ? sPlayer : new StringBuilder()
+				EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sPlayer);
+				String message = ScorePlayerTeam.formatPlayerName(player.getTeam(), sPlayer);
+				sPlayer = IRCBot.stripColorsForIRC(message.substring(0,message.length()-2));
+				lPlayers = lPlayers + ((lPlayers == "") ? sPlayer : new StringBuilder()
 								.append(", ").append(sPlayer).toString());
 			}
-			TkIrc.toIrc.sendMessage(d, lPlayers);
+			TkIrc.toIrc.sendMessage(nick, lPlayers);
 			return;
 		}
-		if (m.toLowerCase().startsWith(Config.prefixforirccommands + "c ")&&isAuthed(n,d)&&m.length() >= Config.prefixforirccommands.length() + 2 ) {
-					String out = MinecraftServer.getServer().executeCommand(m.substring(3));
+		if (m.toLowerCase().startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 ) {
+					String out = MinecraftServer.getServer().executeCommand(m.substring(1));
 					if (out.startsWith(Config.prefixforirccommands)) {
 						out = out.substring(Config.prefixforirccommands.length()+1);
 					}
-					TkIrc.toIrc.sendMessage(d, out);
+					TkIrc.toIrc.sendMessage(nick, out);
 			return;
 		}
 
-		if (m.equals(Config.prefixforirccommands + "status")) {
-			TkIrc.toIrc.sendMessage(d, TkIrc.toIrc.getrawurle());
+		if (m.equals("status")) {
+			TkIrc.toIrc.sendMessage(nick, TkIrc.toIrc.getrawurle());
 			return;
 		}
-		if (m.equals(Config.prefixforirccommands + "help")) {
-		String msgb = "Prefix:_"+Config.prefixforirccommands+"_:_help|_players|_status|_tps_<t_or_worldNum>|_";
-		if (isAuthed(n, null)){msgb = msgb+"set_<command>_<reply>|_unset_<command>|_c_<mcCommand>|_";}
-		Iterator<String> commands = TkIrc.commands.keySet().iterator();
-		while (commands.hasNext()){
+		if (m.equals("help")) {
+	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| ";
+		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| ";}
+		 Iterator<String> commands = TkIrc.commands.keySet().iterator();
+	 	 while (commands.hasNext()){
 			String current = commands.next();
-			 msgb = msgb+current+"|";
+			 msgb = msgb+current+"| ";
 		    }
-		 TkIrc.toIrc.sendNotice(n, msgb);
+		 TkIrc.toIrc.sendNotice(usr, msgb);
 		 return;
 		}
-		if (m.startsWith(Config.prefixforirccommands + "tps")) {
+		if (m.startsWith("tps")) {
 			StringBuilder out = new StringBuilder();
 			NumberFormat percentFormatter = NumberFormat.getPercentInstance();
-			boolean equalz = !m.substring(4).trim().isEmpty();
+			boolean equalz = !m.substring(3).trim().isEmpty();
 			percentFormatter.setMaximumFractionDigits(1);
 			boolean wasInt = false;
 			double totalTickTime = 0.0D;
@@ -112,7 +130,7 @@ public class IRCBot extends IRCLib implements API {
 				try {
 					equals = equalz
 							&& id.equals(Integer
-									.parseInt(m.substring(4).trim()));
+									.parseInt(m.substring(3).trim()));
 					wasInt = true;
 				} catch (NumberFormatException e) {
 				}
@@ -126,12 +144,12 @@ public class IRCBot extends IRCLib implements API {
 								id,
 								DimensionManager.getProvider(id.intValue())
 										.getDimensionName() });
-				if (!m.substring(4).isEmpty()) {
+				if (!m.substring(3).isEmpty()) {
 					if (equals) {
-						TkIrc.toIrc.sendMessage(d, outToPlayer);
+						TkIrc.toIrc.sendMessage(nick, outToPlayer);
 					}
 				} else {
-					TkIrc.toIrc.sendMessage(d, outToPlayer);
+					TkIrc.toIrc.sendMessage(nick, outToPlayer);
 				}
 			}
 
@@ -142,51 +160,44 @@ public class IRCBot extends IRCLib implements API {
 							percentFormatter.format(tps / 20.0D),
 							Double.valueOf(totalTickTime) });
 			if (!wasInt || !equalz) {
-				TkIrc.toIrc.sendMessage(d, out1);
+				TkIrc.toIrc.sendMessage(nick, out1);
 			}
+			return;
+		}
+		if (m.startsWith("fakecrash") && isAuthed(usr,nick)){
+			TkIrc.FakeCrash(nick);
 			return;
 		}
 		String[] commandsplit = m.split(" ", 3);
 		try {
-			if (TkIrc.commands.containsKey(m.substring(
-					Config.prefixforirccommands.length()).toLowerCase())
-					&& m.startsWith(Config.prefixforirccommands)) {
-				// System.out.println("valid command "+m.substring(Config.prefixforirccommands.length()));
-				TkIrc.toIrc.sendMessage(d, TkIrc.commands.get(m.substring(
-						Config.prefixforirccommands.length()).toLowerCase()));
+			String mesig = commandsplit[0];
+			if (TkIrc.commands.containsKey(mesig)) {
+				
+				TkIrc.toIrc.sendMessage(nick, TkIrc.commands.get(mesig));
 				return;
 			}
-			if (m.startsWith(Config.prefixforirccommands + "unset")
-					&& commandsplit[1] != null && isAuthed(n,d)) {
+			if (m.startsWith("unset")
+					&& commandsplit[1] != null && isAuthed(usr,nick)) {
 				if (TkIrc.commands.get(commandsplit[1]) != null) {
 					TkIrc.commands.remove(commandsplit[1]);
-					TkIrc.toIrc.sendMessage(d, "removed " + commandsplit[1]);
+					TkIrc.toIrc.sendMessage(nick, "removed " + commandsplit[1]);
 					TkIrc.toIrc.savecmd();
 				} else {
-					TkIrc.toIrc.sendMessage(d,
+					TkIrc.toIrc.sendMessage(nick,
 							"Command to be removed not found");
 				}
 				return;
 			}
-			if (m.startsWith(Config.prefixforirccommands + "set")
-					&& commandsplit[2] != null && commandsplit[1] != null && isAuthed(n,d)) {
-				TkIrc.commands.put(commandsplit[1].toLowerCase(),
-						commandsplit[2]);
-				TkIrc.toIrc.sendMessage(d, "Set " + commandsplit[1] + " as "
-						+ commandsplit[2]);
+			if (m.startsWith("set") && commandsplit[2] != null && commandsplit[1] != null && isAuthed(usr,nick)) {
+				
+				TkIrc.commands.put(commandsplit[1].toLowerCase(),commandsplit[2]);
+				TkIrc.toIrc.sendNotice(usr, "Set " + commandsplit[1] + " as "+ commandsplit[2]);
 				TkIrc.toIrc.savecmd();
 				return;
 			}
 		} catch (IndexOutOfBoundsException e) {
-			TkIrc.toIrc.sendMessage(d, "Invalid command format");
+			TkIrc.toIrc.sendMessage(nick, "Invalid command format");
 			return;
-		}
-		n = colorNick(n, u, h);
-		if (d.equals(this.sNick)) {
-			mcMessage("[IRC PM] <" + n + "> ", m);
-		} else {
-			String sPrefix = Config.pIngameMSG.replaceAll("%c", d).replaceAll("%n", n)+ " ";
-			mcMessage(sPrefix, m);
 		}
 	}
 
@@ -195,7 +206,7 @@ public class IRCBot extends IRCLib implements API {
 
 		String sPrefix = Config.pIngameAction.replaceAll("%c",d).replaceAll("%n", n)+" ";
 
-		mcMessage("", sPrefix + m);
+		mcMessage("", sPrefix + m,false);
 	}
 
 	public void onConnected() {
@@ -262,17 +273,17 @@ public class IRCBot extends IRCLib implements API {
 
 	public void onCTCP(String n, String u, String h, String d, String m) {
 		if (m.split(" ")[0].equals("VERSION")) {
-			sendCTCPReply(n, "Version Personal TKserver 0.2");
+			sendCTCPReply(n, "Personal TKserver 0.3");
 		}
 
 		if (m.split(" ")[0].equals("TIME")) {
 			sendCTCPReply(n,
-					"CLOCK my internal clock is broken, plz donate ;_;");
+					"My internal clock is broken, plz donate ;_;");
 		}
 
 		if (m.split(" ")[0].equals("SOURCE")) {
 			sendCTCPReply(n,
-					"SOURCE wait, i got this... a source is some kind of document right?");
+					"Wait, i got this... a source is some kind of document right?");
 		}
 
 		if (m.split(" ")[0].equals("PAGE")) {
@@ -284,11 +295,11 @@ public class IRCBot extends IRCLib implements API {
 		if (m.split(" ")[0].equals("USERINFO")) {
 			sendCTCPReply(
 					n,
-					"USERINFO Gender=Female; yeah, i have a gender! who said servers can't have genders!");
+					"Gender=Female; yeah, i have a gender! who said servers can't have genders!");
 		}
 	}
 
-	public void mcMessage(String p, String m) {
+	public void mcMessage(String p, String m,boolean isPM) {
 		if (m == null) {
 			return;
 		}
@@ -297,47 +308,39 @@ public class IRCBot extends IRCLib implements API {
 			p = "";
 		}
 
-		if (m.startsWith("$$")) {
-			return;
-		}
-
-		if (p.startsWith("$$")) {
-			return;
-		}
-
-		m = stripColors(m);
-
+		m = stripColorsForMC(m);
+        String x = m;
+        try{
+		if(isPM && m.length() > 3){x  = m.split(" ")[1];}
 		if (Config.gameType == Config.Type.SMPREMOTE) {
-			TkIrc.proxy.mcMessage(p, m);
+			TkIrc.proxy.mcMessage(p, x);
 		} else {
-			String[] mParts = m.split("(?<=\\G.{"
+			String[] mParts = x.split("(?<=\\G.{"
 					+ Integer.toString(118 - p.length()) + "})");
-
+            System.out.println(m);
 			for (String mPart : mParts) {
-				if (MinecraftServer.getServer() != null
-						&& MinecraftServer.getServer()
-								.getConfigurationManager() != null) {
+				if (MinecraftServer.getServer() != null && MinecraftServer.getServer().getConfigurationManager() != null) {
+					if(!isPM){
 					MinecraftServer
 							.getServer()
 							.getConfigurationManager()
-							.sendPacketToAllPlayers(
-									new Packet3Chat(ChatMessageComponent
-											.createFromText(p + mPart)));
+							.sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText(p + mPart)));}
+					else{MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(m.split(" ")[0]).sendChatToPlayer(ChatMessageComponent.createFromText(p +": "+ mPart));}
 				}
 			}
 		}
+        }catch(Exception err){/*TkIrc.toIrc.sendMessage(p, "yo, you fakd up shit.");*/}
 	}
 
 	public void mcMessage(String m) {
-		if (m.startsWith("$$")||m == null) {
+		if (m == null) {
 			return;
 		}
 
 		if (Config.gameType == Config.Type.SMPREMOTE) {
 			TkIrc.proxy.mcMessage(m);
 		} else {
-			String[] mParts = m.split("(?<=\\G.{" + Integer.toString(118)
-					+ "})");
+			String[] mParts = m.split("(?<=\\G.{" + Integer.toString(118) + "})");
 
 			for (String mPart : mParts) {
 				if (MinecraftServer.getServer() != null
@@ -350,8 +353,8 @@ public class IRCBot extends IRCLib implements API {
 		}
 	}
 
-	public static String stripColors(String message) {
-		message = message.replaceAll(Character.toString('�'), "");
+	public static String stripColorsForMC(String message) {
+		message = message.replaceAll(Character.toString('Â'), "");
 		message = message.replaceAll("§([^\\d+r])", "$1");
 		message = message.replaceAll("(" + Character.toString('\003')
 				+ "\\d{2}),\\d{1,2}", "§1");
@@ -387,6 +390,28 @@ public class IRCBot extends IRCLib implements API {
 		message = message.replaceAll(Character.toString('\037'), "");
 		message = message.replaceAll(Character.toString('\035'), "");
 		message = message.replaceAll(Character.toString('\026'), "");
+
+		return message;
+	}
+	
+	public static String stripColorsForIRC(String message) {
+		message = message.replaceAll("§7",Character.toString('\003') + "14");
+		message = message.replaceAll("§8",Character.toString('\003') + "14");
+		message = message.replaceAll("§d",Character.toString('\003') + "13");
+		message = message.replaceAll("§9",Character.toString('\003') + "12");
+		message = message.replaceAll("§b",Character.toString('\003') + "11");
+		message = message.replaceAll("§3",Character.toString('\003') + "10");
+		message = message.replaceAll("§a",Character.toString('\003') + "9");
+		message = message.replaceAll("§e",Character.toString('\003') + "8");
+		message = message.replaceAll("§6",Character.toString('\003') + "7");
+		message = message.replaceAll("§5",Character.toString('\003') + "6");
+		message = message.replaceAll("§4",Character.toString('\003') + "5");
+		message = message.replaceAll("§c",Character.toString('\003') + "4");
+		message = message.replaceAll("§2",Character.toString('\003') + "3");
+		message = message.replaceAll("§1",Character.toString('\003') + "2");
+		message = message.replaceAll("§0",Character.toString('\003') + "1");
+		message = message.replaceAll("§f",Character.toString('\003') + "0");
+		message = message.replaceAll("§r",Character.toString('\003'));
 
 		return message;
 	}

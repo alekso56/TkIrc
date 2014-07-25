@@ -20,6 +20,7 @@ public class Config
   static final String GENERAL = "general";
   static boolean enabled;
   static boolean depinger;
+  static boolean scoreboardColors;
   static String botName;
   static String opColor;
   static String sHost;
@@ -47,14 +48,12 @@ public class Config
   static void loadConfig(Configuration config)
   {
     config.load();
-    config.removeCategory(config.getCategory("block"));
-    config.removeCategory(config.getCategory("item"));
-
     botName = config.get("general", "Nickname", getNick()).getString();
     opColor = config.get("general", "opColor", "e").getString();
     config.get("general", "opColor", "e").comment = "Color code for OPs on your server. r = no color. Uses minecraft colors";
     enabled = config.get("general", "ircEnabled", false).getBoolean(false);
-
+    scoreboardColors = config.get("general", "ScoreboardColorsInIRCMSGS", true).getBoolean(false);
+    
     sHost = config.get("Server", "hostname", "irc.esper.net").getString();
     sPort = config.get("Server", "serverPort", 6667).getInt(6667);
     sKey = config.get("Server", "serverKey", "").getString();
@@ -82,7 +81,6 @@ public class Config
     	TkIrc.ops.add(config.get("OPs", "Odd",3).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "SafPlusPlus",4).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName().toLowerCase());
-    	TkIrc.ops.add(config.get("OPs", "Odd",7).getName().toLowerCase());
     
     eDeath = config.get("Events", "Deaths", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
     eJoinMC = config.get("Events", "minecraft_joins", gameType == Type.SMP).getBoolean(gameType == Type.SMP);

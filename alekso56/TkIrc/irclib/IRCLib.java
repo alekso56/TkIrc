@@ -319,7 +319,7 @@ public class IRCLib extends Thread {
 	}
 	
 	public void sendNotice(String usr, String msg) {
-		sendRaw("NOTICE " + usr+" "+msg);
+		sendRaw("NOTICE " + usr+" :"+msg);
 	}
 
 	public void sendCTCP(String d, String m) {
@@ -399,46 +399,55 @@ public class IRCLib extends Thread {
 			json = a.toString();
 		} catch (IOException ex) {
 			System.err
-					.println("Error when trying to retrieve Mojang server status data.");
+			.println("Error when trying to retrieve Mojang server status data.");
 		}
-		Gson gson;
-		ArrayList<HashMap<String, String>> jsonObject;
-		gson = new Gson();
-
-		Type listType = new TypeToken<ArrayList<HashMap<String, String>>>() {
-		}.getType();
-		jsonObject = gson.fromJson(json, listType);
 		StringBuilder s = new StringBuilder();
-		if (jsonObject.get(0).get("minecraft.net").equalsIgnoreCase("green")) {
-		} else {
-			// mc webpage is borked
-			s.append("mcWeb,");
-		}
-		if (jsonObject.get(1).get("login.minecraft.net")
-				.equalsIgnoreCase("green")) {
-		} else {
-			// login is borked
-			s.append("login,");
-		}
+		try{
+			ArrayList<HashMap<String, String>> jsonObject;
+			Gson gson = new Gson();
 
-		if (jsonObject.get(2).get("session.minecraft.net")
-				.equalsIgnoreCase("green")) {
-		} else {
-			// sessionmc is brok
-			s.append("session,");
-		}
+			Type listType = new TypeToken<ArrayList<HashMap<String, String>>>() {
+			}.getType();
+			jsonObject = gson.fromJson(json, listType);
+			if (!jsonObject.get(0).get("minecraft.net").equalsIgnoreCase("green")) {
+				// mc webpage is borked
+				s.append("mcWeb,");
+			}
+			if (!jsonObject.get(1).get("session.minecraft.net").equalsIgnoreCase("green")) {
+				s.append("session,");
+			}
 
-		if (jsonObject.get(5).get("skins.minecraft.net")
-				.equalsIgnoreCase("green")) {
-		} else {
-			// skins are borked
-			s.append("skins");
-		}
+			if (!jsonObject.get(2).get("account.mojang.com").equalsIgnoreCase("green")) {
+				s.append("mojangaccount,");
+			}
+			
+			if (!jsonObject.get(3).get("auth.mojang.com").equalsIgnoreCase("green")) {
+				s.append("mojangAuth,");
+			}
+
+			if (!jsonObject.get(4).get("skins.minecraft.net").equalsIgnoreCase("green")) {
+				s.append("skins,");
+			}
+			if (!jsonObject.get(5).get("authserver.mojang.com").equalsIgnoreCase("green")) {
+				s.append("mojangauthserver,");
+			}
+			if (!jsonObject.get(6).get("sessionserver.mojang.com").equalsIgnoreCase("green")) {
+				s.append("mojangsession,");
+			}
+			if (!jsonObject.get(7).get("api.mojang.com").equalsIgnoreCase("green")) {
+				s.append("mojangapi,");
+			}
+			if (!jsonObject.get(8).get("textures.minecraft.net").equalsIgnoreCase("green")) {
+				s.append("textures MC");
+			}
+			}catch(NullPointerException err){return "Incompatible status format, update required";}
+
 		if (s.length() != 0) {
 			return "These services are brok; "+s.toString();
 		} else {
 			return "All services are OK!";
 		}
+
 	}
 
 	public void savecmd() {
