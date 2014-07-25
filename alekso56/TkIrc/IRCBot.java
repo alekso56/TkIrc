@@ -81,9 +81,7 @@ public class IRCBot extends IRCLib implements API {
 			String lPlayers = aPlayers.length == 0 ? "None." : "";
 
 			for (String sPlayer : aPlayers) {
-				EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sPlayer);
-				String message = ScorePlayerTeam.formatPlayerName(player.getTeam(), sPlayer);
-				sPlayer = IRCBot.stripColorsForIRC(message.substring(0,message.length()-2));
+				sPlayer = Scoreboard(sPlayer, false);
 				lPlayers = lPlayers + ((lPlayers == "") ? sPlayer : new StringBuilder()
 								.append(", ").append(sPlayer).toString());
 			}
@@ -199,6 +197,15 @@ public class IRCBot extends IRCLib implements API {
 			TkIrc.toIrc.sendMessage(nick, "Invalid command format");
 			return;
 		}
+	}
+
+	public static String Scoreboard(String sPlayer,boolean isMSG) {
+		if(!isMSG || Config.scoreboardColors){
+		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sPlayer);
+		String message = ScorePlayerTeam.formatPlayerName(player.getTeam(), sPlayer);
+		sPlayer = stripColorsForIRC(message.substring(0,message.length()-2));
+		}
+		return sPlayer;
 	}
 
 	public void onAction(String n, String u, String h, String d, String m) {
@@ -317,7 +324,6 @@ public class IRCBot extends IRCLib implements API {
 		} else {
 			String[] mParts = x.split("(?<=\\G.{"
 					+ Integer.toString(118 - p.length()) + "})");
-            System.out.println(m);
 			for (String mPart : mParts) {
 				if (MinecraftServer.getServer() != null && MinecraftServer.getServer().getConfigurationManager() != null) {
 					if(!isPM){
@@ -427,6 +433,7 @@ public class IRCBot extends IRCLib implements API {
 			return n;
 		}
 	}
+	
 
 	static String getNickColor(String n) {
 		return n;

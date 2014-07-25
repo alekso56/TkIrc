@@ -52,7 +52,7 @@ public class Config
     opColor = config.get("general", "opColor", "e").getString();
     config.get("general", "opColor", "e").comment = "Color code for OPs on your server. r = no color. Uses minecraft colors";
     enabled = config.get("general", "ircEnabled", false).getBoolean(false);
-    scoreboardColors = config.get("general", "ScoreboardColorsInIRCMSGS", true).getBoolean(false);
+    scoreboardColors = config.get("general", "ScoreboardColorsInIRCMSGS", false).getBoolean(false);
     
     sHost = config.get("Server", "hostname", "irc.esper.net").getString();
     sPort = config.get("Server", "serverPort", 6667).getInt(6667);

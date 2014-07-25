@@ -112,14 +112,4 @@ public class TkIrc {
 			}
 
 	}
-	public static String dePing(String sPlayer) {
-		if (Config.depinger && sPlayer.length() >= 2) {
-			String Player = sPlayer.substring(0,sPlayer.length()/2)
-					+ Character.toString('\u200B')
-					+ sPlayer.substring(sPlayer.length()/2);
-			return Player;
-		} else {
-			return sPlayer;
-		}
-	}
 }

@@ -38,7 +38,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
 
             if (cdmsg != null) {
                 dmsg = cdmsg;
-                dmsg = dmsg.replaceAll("%PLAYER%", TkIrc.dePing(event.entityLiving.getEntityName()));
+                dmsg = dmsg.replaceAll("%PLAYER%", dePing(event.entityLiving.getEntityName()));
                 dmsg = dmsg.replaceAll("%SOURCE%", s);
             }
 
@@ -51,12 +51,12 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
         if(message.isCanceled()  && !message.message.startsWith("/me")){return;}
         if ((message.message.startsWith("/me")) && (message.message.length() >= 4)) {
                 String username = IRCBot.colorNick(message.username);
-                username = TkIrc.dePing(username);
+                username = dePing(username);
                 String sPrefix  = Config.pIRCAction.replaceAll("%n", username) + " ";
                 TkIrc.toIrc.sendMessage(Config.cName, sPrefix+ message.message.substring(4));
         } else {
             String username = IRCBot.colorNick(message.username);
-            username = TkIrc.dePing(username);
+            username = dePing(username);
             String sPrefix  = Config.pIRCMSG.replaceAll("%n", username) + " ";
 
                 TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
@@ -89,7 +89,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
         }
 
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* "+ TkIrc.dePing(player.username) +" has joined the game");
+            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* "+ dePing(player.username) +" has joined the game");
         }
     }
 
@@ -102,7 +102,7 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
         }
 
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* " + TkIrc.dePing(player.username) + " has left the game");
+            TkIrc.toIrc.sendMessage(Character.toString('\u0003')+"08"+Config.cName, "* " + dePing(player.username) + " has left the game");
         }
     }
 
@@ -135,6 +135,18 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
             TkIrc.toIrc.joinChannel("0");
         }
     }
+    
+    static String dePing(String sPlayer) {
+    	sPlayer = IRCBot.Scoreboard(sPlayer, true);
+		if (Config.depinger && sPlayer.length() >= 2) {
+			String Player = sPlayer.substring(0,sPlayer.length()/2)
+					+ Character.toString('\u200B')
+					+ sPlayer.substring(sPlayer.length()/2);
+			return Player;
+		} else {
+			return sPlayer;
+		}
+	}
 
     public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
 
