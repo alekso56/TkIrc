@@ -8,18 +8,22 @@ import net.minecraft.util.ChatMessageComponent;
 
 public class TkHQ extends CommandBase
 {
-  public String getCommandName()
+  @Override
+public String getCommandName()
   {
     return "tki";
   }
-  public String getCommandUsage(ICommandSender par1iCommandSender)
+  @Override
+public String getCommandUsage(ICommandSender par1iCommandSender)
   {
     return "/" + getCommandName() + " help";
   }
-  public boolean canCommandSenderUseCommand(ICommandSender par1iCommandSender)
+  @Override
+public boolean canCommandSenderUseCommand(ICommandSender par1iCommandSender)
   {
     return super.canCommandSenderUseCommand(par1iCommandSender);
   }
+@Override
 public void processCommand(ICommandSender icommandsender, String[] astring) {
 		    if (astring.length < 1) { icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Commands: reconnect,kick,ban,unban")); return;}
 		    if (astring[0].equalsIgnoreCase("reconnect")) {

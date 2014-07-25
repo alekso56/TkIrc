@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import alekso56.TkIrc.irclib.IRCLib;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
@@ -20,7 +19,6 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = "TKIRC", name = "TK-IRC", version = "2.4", dependencies = "required-after:Forge@[9.11.1.633,]")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
@@ -36,10 +34,6 @@ public class TkIrc {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
-			Config.gameType = Config.Type.SMP;
-		}
-
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		Config.loadConfig(config);
 
@@ -97,7 +91,7 @@ public class TkIrc {
 	        String comment;
 			try
 	        {
-	            comment = astring[(int)(System.nanoTime() % (long)astring.length)];
+	            comment = astring[(int)(System.nanoTime() % astring.length)];
 	        }
 	        catch (Throwable throwable)
 	        {

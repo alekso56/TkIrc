@@ -10,7 +10,6 @@ import net.minecraftforge.common.Property;
 
 public class Config
 {
-  static Type gameType = Type.SSP;
   static final String SERVER = "Server";
   static final String CHANNEL = "Channel";
   static final String NICKSERV = "NickServ";
@@ -82,8 +81,8 @@ public class Config
     	TkIrc.ops.add(config.get("OPs", "SafPlusPlus",4).getName().toLowerCase());
     	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName().toLowerCase());
     
-    eDeath = config.get("Events", "Deaths", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
-    eJoinMC = config.get("Events", "minecraft_joins", gameType == Type.SMP).getBoolean(gameType == Type.SMP);
+    eDeath = config.get("Events", "Deaths", false).getBoolean(false);
+    eJoinMC = config.get("Events", "minecraft_joins", false).getBoolean(false);
     eJoinIRC = config.get("Events", "IRC_Joins", false).getBoolean(false);
     eIRCNick = config.get("Events", "IRC_Nick_Changes", true).getBoolean(true);
 
@@ -118,10 +117,5 @@ public class Config
   static String getNick() {
     Random random = new Random();
     return "TK" + Integer.toString(random.nextInt(9999));
-  }
-
-  static enum Type
-  {
-    SMP, SSP, SMPREMOTE, SMPLAN;
   }
 }

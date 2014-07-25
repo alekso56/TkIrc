@@ -53,8 +53,8 @@ public class Base64
   {
     for (int i = 0; i < args.length; i++)
     {
-      System.err.println("encoding \"" + args[i] + "\"");
-      System.out.println(encode(args[i]));
+     // System.err.println("encoding \"" + args[i] + "\"");
+     // System.out.println(encode(args[i]));
     }
   }
 }

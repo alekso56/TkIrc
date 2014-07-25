@@ -10,7 +10,10 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraftforge.common.DimensionManager;
+import alekso56.TkIrc.irclib.Base64;
 import alekso56.TkIrc.irclib.IRCLib;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 
 public class IRCBot extends IRCLib implements API {
 	private double timeFormat(long[] par1ArrayOfLong) {
@@ -27,6 +30,7 @@ public class IRCBot extends IRCLib implements API {
 		return time / par1ArrayOfLong.length;
 	}
 
+	@Override
 	public boolean isAuthed(String username,String d) {
 		if (TkIrc.ops.contains(username.toLowerCase())) {
 			String authnum = "0";
@@ -62,6 +66,7 @@ public class IRCBot extends IRCLib implements API {
 		return false;
 	}
 
+	@Override
 	public void onMessage(String usr, String u, String h, String nick, String m) {
 		if(!m.startsWith(Config.prefixforirccommands)){
 			usr = colorNick(usr, u, h);
@@ -75,8 +80,8 @@ public class IRCBot extends IRCLib implements API {
 		}
 		else{m = m.substring(Config.prefixforirccommands.length());}
 		
-		if (m.equals("players")
-				&& ((Config.gameType == Config.Type.SMP) || (Config.gameType == Config.Type.SMPLAN))) {
+		if (m.startsWith("players")
+				&& (Side.SERVER == FMLCommonHandler.instance().getSide())) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
 			String lPlayers = aPlayers.length == 0 ? "None." : "";
 
@@ -97,12 +102,12 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 
-		if (m.equals("status")) {
+		if (m.startsWith("status")) {
 			TkIrc.toIrc.sendMessage(nick, TkIrc.toIrc.getrawurle());
 			return;
 		}
-		if (m.equals("help")) {
-	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| ";
+		if (m.startsWith("help")) {
+	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| base64| ";
 		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| ";}
 		 Iterator<String> commands = TkIrc.commands.keySet().iterator();
 	 	 while (commands.hasNext()){
@@ -112,6 +117,9 @@ public class IRCBot extends IRCLib implements API {
 		 TkIrc.toIrc.sendNotice(usr, msgb);
 		 return;
 		}
+		if(m.startsWith("base64") && m.length() > 8){
+			TkIrc.toIrc.sendMessage(nick, Base64.encode(m.substring(5)));
+		}
 		if (m.startsWith("tps")) {
 			StringBuilder out = new StringBuilder();
 			NumberFormat percentFormatter = NumberFormat.getPercentInstance();
@@ -120,7 +128,7 @@ public class IRCBot extends IRCLib implements API {
 			boolean wasInt = false;
 			double totalTickTime = 0.0D;
 			for (Integer id : DimensionManager.getIDs()) {
-				double tickTime = timeFormat((long[]) MinecraftServer
+				double tickTime = timeFormat(MinecraftServer
 						.getServer().worldTickTimes.get(id)) * 1.0E-006D;
 				double tps = Math.min(1000.0D / tickTime, 20.0D);
 				Boolean equals = false;
@@ -203,11 +211,12 @@ public class IRCBot extends IRCLib implements API {
 		if(!isMSG || Config.scoreboardColors){
 		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sPlayer);
 		String message = ScorePlayerTeam.formatPlayerName(player.getTeam(), sPlayer);
-		sPlayer = stripColorsForIRC(message.substring(0,message.length()-2));
+		sPlayer = stripColorsForIRC(message.substring(0,message.length()));
 		}
 		return sPlayer;
 	}
 
+	@Override
 	public void onAction(String n, String u, String h, String d, String m) {
 		n = colorNick(n, u, h);
 
@@ -216,10 +225,12 @@ public class IRCBot extends IRCLib implements API {
 		mcMessage("", sPrefix + m,false);
 	}
 
+	@Override
 	public void onConnected() {
 		TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
 	}
 
+	@Override
 	public void onJoin(String n, String u, String h, String c) {
 		if (!Config.eJoinIRC) {
 			return;
@@ -230,6 +241,7 @@ public class IRCBot extends IRCLib implements API {
 		}
 	}
 
+	@Override
 	public void onNick(String on, String nn) {
 		if (!Config.eIRCNick) {
 			return;
@@ -241,6 +253,7 @@ public class IRCBot extends IRCLib implements API {
 		}
 	}
 
+	@Override
 	public void onPart(String n, String u, String h, String c, String r) {
 		if (!Config.eJoinIRC) {
 			return;
@@ -251,6 +264,7 @@ public class IRCBot extends IRCLib implements API {
 		}
 	}
 
+	@Override
 	public void onQuit(String n, String u, String h, String r) {
 		if (!Config.eJoinIRC) {
 			return;
@@ -259,6 +273,7 @@ public class IRCBot extends IRCLib implements API {
 		mcMessage("[" + Config.cName + "] * " + n + " quit IRC (" + r + ")");
 	}
 
+	@Override
 	public void onKick(String n, String kn, String u, String h, String c,
 			String r) {
 		if (!Config.eJoinIRC) {
@@ -269,6 +284,7 @@ public class IRCBot extends IRCLib implements API {
 				+ "was kicked from the channel by " + n + " (" + r + ")");
 	}
 
+	@Override
 	public void onKick(String s, String kn, String c, String r) {
 		if (!Config.eJoinIRC) {
 			return;
@@ -278,6 +294,7 @@ public class IRCBot extends IRCLib implements API {
 				+ "was kicked from the channel by " + s + " (" + r + ")");
 	}
 
+	@Override
 	public void onCTCP(String n, String u, String h, String d, String m) {
 		if (m.split(" ")[0].equals("VERSION")) {
 			sendCTCPReply(n, "Personal TKserver 0.3");
@@ -319,7 +336,7 @@ public class IRCBot extends IRCLib implements API {
         String x = m;
         try{
 		if(isPM && m.length() > 3){x  = m.split(" ")[1];}
-		if (Config.gameType == Config.Type.SMPREMOTE) {
+		if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
 			TkIrc.proxy.mcMessage(p, x);
 		} else {
 			String[] mParts = x.split("(?<=\\G.{"
@@ -343,7 +360,7 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 
-		if (Config.gameType == Config.Type.SMPREMOTE) {
+		if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
 			TkIrc.proxy.mcMessage(m);
 		} else {
 			String[] mParts = m.split("(?<=\\G.{" + Integer.toString(118) + "})");
@@ -407,16 +424,16 @@ public class IRCBot extends IRCLib implements API {
 		message = message.replaceAll("§9",Character.toString('\003') + "12");
 		message = message.replaceAll("§b",Character.toString('\003') + "11");
 		message = message.replaceAll("§3",Character.toString('\003') + "10");
-		message = message.replaceAll("§a",Character.toString('\003') + "9");
-		message = message.replaceAll("§e",Character.toString('\003') + "8");
-		message = message.replaceAll("§6",Character.toString('\003') + "7");
-		message = message.replaceAll("§5",Character.toString('\003') + "6");
-		message = message.replaceAll("§4",Character.toString('\003') + "5");
-		message = message.replaceAll("§c",Character.toString('\003') + "4");
-		message = message.replaceAll("§2",Character.toString('\003') + "3");
-		message = message.replaceAll("§1",Character.toString('\003') + "2");
-		message = message.replaceAll("§0",Character.toString('\003') + "1");
-		message = message.replaceAll("§f",Character.toString('\003') + "0");
+		message = message.replaceAll("§a",Character.toString('\003') + "09");
+		message = message.replaceAll("§e",Character.toString('\003') + "08");
+		message = message.replaceAll("§6",Character.toString('\003') + "07");
+		message = message.replaceAll("§5",Character.toString('\003') + "06");
+		message = message.replaceAll("§4",Character.toString('\003') + "05");
+		message = message.replaceAll("§c",Character.toString('\003') + "04");
+		message = message.replaceAll("§2",Character.toString('\003') + "03");
+		message = message.replaceAll("§1",Character.toString('\003') + "02");
+		message = message.replaceAll("§0",Character.toString('\003') + "01");
+		message = message.replaceAll("§f",Character.toString('\003') + "00");
 		message = message.replaceAll("§r",Character.toString('\003'));
 
 		return message;
