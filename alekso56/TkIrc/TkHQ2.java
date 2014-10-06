@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 
 public class TkHQ2 implements ICommand {
 
@@ -30,7 +30,7 @@ public class TkHQ2 implements ICommand {
 
 	@Override
 	public void processCommand(ICommandSender icommandsender, String[] astring) {
-       icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("fak u so much."));
+       icommandsender.addChatMessage(new ChatComponentText("fak u so much."));
 	}
 
 	@Override

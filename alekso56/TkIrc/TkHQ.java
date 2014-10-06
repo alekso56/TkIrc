@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 
 public class TkHQ extends CommandBase
 {
@@ -25,7 +25,7 @@ public boolean canCommandSenderUseCommand(ICommandSender par1iCommandSender)
   }
 @Override
 public void processCommand(ICommandSender icommandsender, String[] astring) {
-		    if (astring.length < 1) { icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Commands: reconnect,kick,ban,unban")); return;}
+		    if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban")); return;}
 		    if (astring[0].equalsIgnoreCase("reconnect")) {
 		      try {
 		        TkIrc.toIrc.close();
@@ -49,7 +49,7 @@ public void processCommand(ICommandSender icommandsender, String[] astring) {
 		      TkIrc.toIrc.sendRaw("MODE " + Config.cName + " -b " + astring[1] + "!*@*");
 		    }
               else if ((astring[0].equalsIgnoreCase("help")) && (astring.length > 0)) {
-            	  icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Commands: reconnect,kick,ban,unban"));
+            	  icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban"));
   }
 }
 }

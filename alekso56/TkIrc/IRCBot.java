@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Iterator;
 
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.packet.Packet3Chat;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.DimensionManager;
 import alekso56.TkIrc.irclib.Base64;
 import alekso56.TkIrc.irclib.IRCLib;
@@ -94,10 +95,7 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 		if (m.toLowerCase().startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 ) {
-					String out = MinecraftServer.getServer().executeCommand(m.substring(1));
-					if (out.startsWith(Config.prefixforirccommands)) {
-						out = out.substring(Config.prefixforirccommands.length()+1);
-					}
+					String out = String.valueOf(MinecraftServer.getServer().getCommandManager().executeCommand(null, m.substring(1)));
 					TkIrc.toIrc.sendMessage(nick, out);
 			return;
 		}
@@ -209,7 +207,7 @@ public class IRCBot extends IRCLib implements API {
 
 	public static String Scoreboard(String sPlayer,boolean isMSG) {
 		if(!isMSG || Config.scoreboardColors){
-		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sPlayer);
+		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(sPlayer);
 		String message = ScorePlayerTeam.formatPlayerName(player.getTeam(), sPlayer);
 		sPlayer = stripColorsForIRC(message.substring(0,message.length()));
 		}
@@ -344,11 +342,8 @@ public class IRCBot extends IRCLib implements API {
 			for (String mPart : mParts) {
 				if (MinecraftServer.getServer() != null && MinecraftServer.getServer().getConfigurationManager() != null) {
 					if(!isPM){
-					MinecraftServer
-							.getServer()
-							.getConfigurationManager()
-							.sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText(p + mPart)));}
-					else{MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(m.split(" ")[0]).sendChatToPlayer(ChatMessageComponent.createFromText(p +": "+ mPart));}
+					MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText(p+mPart));}
+					else{MinecraftServer.getServer().getConfigurationManager().func_152612_a(m.split(" ")[0]).addChatComponentMessage(new ChatComponentText(p +": "+ mPart));}
 				}
 			}
 		}
@@ -369,8 +364,7 @@ public class IRCBot extends IRCLib implements API {
 				if (MinecraftServer.getServer() != null
 						&& MinecraftServer.getServer()
 								.getConfigurationManager() != null) {
-					MinecraftServer.getServer().getConfigurationManager()
-							.sendPacketToAllPlayers(new Packet3Chat(mPart));
+					MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText(mPart));
 				}
 			}
 		}

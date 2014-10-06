@@ -1,37 +1,31 @@
 package alekso56.TkIrc;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.NetLoginHandler;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet1Login;
-import net.minecraft.network.packet.Packet3Chat;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.NetHandlerStatusServer;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.IPlayerTracker;
-import cpw.mods.fml.common.network.IChatListener;
-import cpw.mods.fml.common.network.IConnectionHandler;
-import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.relauncher.Side;
 
-public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandler {
-    @ForgeSubscribe
-    public void onPlayerDead(LivingDeathEvent event) {
+public class TkEvents {
+	
+    public LivingDeathEvent onPlayerDead(LivingDeathEvent event) {
         if (!Config.eDeath) {
-            return;
+            return event;
         }
 
         String s = (event.source.getSourceOfDamage() != null)
-                   ? event.source.getSourceOfDamage().getEntityName()
+                   ? event.source.getSourceOfDamage().getCommandSenderName()
                    : "generic";
 
         if ((event.entityLiving instanceof EntityPlayer)) {
             String dmsg = StatCollector.translateToLocalFormatted("death.attack." + event.source.damageType,
-                              new Object[] { event.entityLiving.getEntityName(),
+                              new Object[] { event.entityLiving.getCommandSenderName(),
                                              s });
             
             String cdmsg = (String) Config.mDeathMessages.get("death." + event.source.damageType);
@@ -40,34 +34,27 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
 
             if (cdmsg != null) {
                 dmsg = cdmsg;
-                dmsg = dmsg.replaceAll("%PLAYER%", dePing(event.entityLiving.getEntityName()));
+                dmsg = dmsg.replaceAll("%PLAYER%", dePing(event.entityLiving.getCommandSenderName()));
                 dmsg = dmsg.replaceAll("%SOURCE%", s);
             }
 
             TkIrc.toIrc.sendMessage(Config.cName, "* " + dmsg);
         }
+		return event;
     }
 
-    @ForgeSubscribe
-    public void onSM(ServerChatEvent message) {
-        if(message.isCanceled()){return;}
+    public ServerChatEvent onSM(ServerChatEvent message) {
+        if(message.isCanceled()){return message;}
             String sPrefix  = Config.pIRCMSG.replaceAll("%n", dePing(IRCBot.colorNick(message.username))) + " ";
             TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
-    }
-    @Override
-	public Packet3Chat clientChat(NetHandler handler, Packet3Chat message)
-    {
-      if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
-        return message;
-      }
 
       String[] aMessage = message.message.split(" ", 2);
 
-      if (aMessage[0].matches("^<" + handler.getPlayer().username + ">$"))
+      if (aMessage[0].matches("^<" + message.username + ">$"))
       {
           TkIrc.toIrc.sendMessage(Config.cName, aMessage[1]);
       }
-      else if ((aMessage[0].matches("^\\*$")) && (aMessage[1].split(" ", 2)[0].matches(handler.getPlayer().username)))
+      else if ((aMessage[0].matches("^\\*$")) && (aMessage[1].split(" ", 2)[0].matches(message.username)))
       {
           TkIrc.toIrc.sendAction(Config.cName, aMessage[1].split(" ", 2)[1]);
       }
@@ -75,43 +62,25 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
       return message;
     }
 
-    @Override
-	public void onPlayerLogin(EntityPlayer player) {
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent player) {
         if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
             TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
         }
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* "+ dePing(player.username) +" has joined the game");
+            TkIrc.toIrc.sendMessage(Config.cName, "* "+ dePing(player.player.getDisplayName()) +" has joined the game");
         }
     }
 
-    @Override
-	public void onPlayerLogout(EntityPlayer player) {
+    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent player) {
         if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
             TkIrc.toIrc.joinChannel("0");
         }
 
         if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* " + dePing(player.username) + " has left the game");
+            TkIrc.toIrc.sendMessage(Config.cName, "* " + dePing(player.player.getDisplayName()) + " has left the game");
         }
     }
-    @Override
-	public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager) {
-        TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
-    }
 
-    @Override
-	public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager) {
-        TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
-    }
-
-    @Override
-	public void connectionClosed(INetworkManager manager) {
-        if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
-            TkIrc.toIrc.joinChannel("0");
-        }
-    }
-    
     private static String dePing(String sPlayer) {
     	sPlayer = IRCBot.Scoreboard(sPlayer, true);
 		if (Config.depinger && sPlayer.length() >= 2) {
@@ -123,16 +92,4 @@ public class TkEvents implements IChatListener, IPlayerTracker, IConnectionHandl
 			return sPlayer;
 		}
 	}
-
-	public void playerLoggedIn(Player player, NetHandler netHandler,INetworkManager manager) {}
-	public String connectionReceived(NetLoginHandler netHandler,INetworkManager manager) {return null;}
-	public void clientLoggedIn(NetHandler clientHandler,INetworkManager manager, Packet1Login login) {}
-	public void onPlayerChangedDimension(EntityPlayer player) {}
-	public void onPlayerRespawn(EntityPlayer player) {}
-	public Packet3Chat serverChat(NetHandler handler, Packet3Chat message) {
-		if ((message.message.startsWith("/me")) && (message.message.length() >= 4)) {
-            String sPrefix  = Config.pIRCAction.replaceAll("%n", dePing(IRCBot.colorNick(handler.getPlayer().username))) + " ";
-            TkIrc.toIrc.sendMessage(Config.cName, sPrefix+ message.message.substring(4));
-		}
-		return message;}
 }

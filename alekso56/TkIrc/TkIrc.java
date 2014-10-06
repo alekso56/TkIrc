@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import alekso56.TkIrc.irclib.IRCLib;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -16,12 +16,10 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.4", dependencies = "required-after:Forge@[9.11.1.633,]")
-@NetworkMod(clientSideRequired = false, serverSideRequired = false)
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.5", dependencies = "required-after:Forge@[9.11.1.633,]")
 public class TkIrc {
 	protected static Configuration config;
 	public static IRCLib toIrc;
@@ -47,11 +45,8 @@ public class TkIrc {
 	{
 		event.registerServerCommand(new TkHQ());
 		event.registerServerCommand(new TkHQ2());
-		TkEvents eHandler = new TkEvents();
-		 MinecraftForge.EVENT_BUS.register(eHandler);
-		 NetworkRegistry.instance().registerConnectionHandler(eHandler);
-		 GameRegistry.registerPlayerTracker(eHandler);
-		NetworkRegistry.instance().registerChatListener(eHandler);
+		 MinecraftForge.EVENT_BUS.register(new TkEvents());
+		 TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
 	}
 
 
@@ -97,7 +92,7 @@ public class TkIrc {
 	        {
 	            comment = "Witty comment unavailable :(";
 	        }
-			FMLLog.log("Minecraft-Server", Level.SEVERE, "%s", "This crash report has been saved to' in ForgeModLoader-server-0.log");;
+			//FMLLog.log("Minecraft-Server", Level.SEVERE, "%s", "This crash report has been saved to' in ForgeModLoader-server-0.log");
 			File file1 = new File(new File(".", "crash-reports"), "crash-Fake-TKI-Crash-server.txt");
 			try {
 				if(file1.exists()){file1.delete();}
