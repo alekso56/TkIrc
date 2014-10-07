@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Iterator;
 
-import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.DimensionManager;
 import alekso56.TkIrc.irclib.Base64;
 import alekso56.TkIrc.irclib.IRCLib;
@@ -95,7 +93,7 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 		if (m.toLowerCase().startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 ) {
-					String out = String.valueOf(MinecraftServer.getServer().getCommandManager().executeCommand(null, m.substring(1)));
+					String out = MinecraftServer.getServer().handleRConCommand(m.substring(1));
 					TkIrc.toIrc.sendMessage(nick, out);
 			return;
 		}

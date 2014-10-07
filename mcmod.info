@@ -1,0 +1,16 @@
+[
+{
+  "modid": "TKI",
+  "name": "TKIrc",
+  "description": "serverside ircbridge for tk.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["alekso56"],
+  "credits": "all hail alekso56",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

@@ -4,22 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import alekso56.TkIrc.irclib.IRCLib;
-import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.5", dependencies = "required-after:Forge@[9.11.1.633,]")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.5", dependencies = "required-after:Forge@[10.12.0.967,]")
 public class TkIrc {
 	protected static Configuration config;
 	public static IRCLib toIrc;
@@ -46,6 +43,7 @@ public class TkIrc {
 		event.registerServerCommand(new TkHQ());
 		event.registerServerCommand(new TkHQ2());
 		 MinecraftForge.EVENT_BUS.register(new TkEvents());
+		 FMLCommonHandler.instance().bus().register(new TkEvents());
 		 TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
 	}
 

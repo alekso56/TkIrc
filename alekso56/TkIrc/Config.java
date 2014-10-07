@@ -82,7 +82,7 @@ public class Config
     	TkIrc.ops.add(config.get("OPs", "Oddstr13",6).getName().toLowerCase());
     
     eDeath = config.get("Events", "Deaths", false).getBoolean(false);
-    eJoinMC = config.get("Events", "minecraft_joins", false).getBoolean(false);
+    eJoinMC = config.get("Events", "minecraft_joins", false).getBoolean(true);
     eJoinIRC = config.get("Events", "IRC_Joins", false).getBoolean(false);
     eIRCNick = config.get("Events", "IRC_Nick_Changes", true).getBoolean(true);
 

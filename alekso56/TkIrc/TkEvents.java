@@ -1,19 +1,17 @@
 package alekso56.TkIrc;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.NetHandlerStatusServer;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.relauncher.Side;
 
 public class TkEvents {
-	
+	@SubscribeEvent
     public LivingDeathEvent onPlayerDead(LivingDeathEvent event) {
         if (!Config.eDeath) {
             return event;
@@ -42,7 +40,8 @@ public class TkEvents {
         }
 		return event;
     }
-
+    
+    @SubscribeEvent
     public ServerChatEvent onSM(ServerChatEvent message) {
         if(message.isCanceled()){return message;}
             String sPrefix  = Config.pIRCMSG.replaceAll("%n", dePing(IRCBot.colorNick(message.username))) + " ";
@@ -61,8 +60,9 @@ public class TkEvents {
 
       return message;
     }
-
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent player) {
+    
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerLoggedInEvent player) {
         if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
             TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
         }
@@ -70,7 +70,8 @@ public class TkEvents {
             TkIrc.toIrc.sendMessage(Config.cName, "* "+ dePing(player.player.getDisplayName()) +" has joined the game");
         }
     }
-
+    
+    @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent player) {
         if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
             TkIrc.toIrc.joinChannel("0");
