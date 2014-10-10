@@ -369,39 +369,37 @@ public class IRCBot extends IRCLib implements API {
 	}
 
 	public static String stripColorsForMC(String message) {
-		message = message.replaceAll(Character.toString('ร'), "");
-		message = message.replaceAll("ยง([^\\d+r])", "$1");
-		message = message.replaceAll("(" + Character.toString('\003')
-				+ "\\d{2}),\\d{1,2}", "ยง1");
-		message = message.replaceAll(Character.toString('\003') + "15", "ยง7");
-		message = message.replaceAll(Character.toString('\003') + "14", "ยง8");
-		message = message.replaceAll(Character.toString('\003') + "13", "ยงd");
-		message = message.replaceAll(Character.toString('\003') + "12", "ยง9");
-		message = message.replaceAll(Character.toString('\003') + "11", "ยงb");
-		message = message.replaceAll(Character.toString('\003') + "10", "ยง3");
-		message = message.replaceAll(Character.toString('\003') + "09", "ยงa");
-		message = message.replaceAll(Character.toString('\003') + "08", "ยงe");
-		message = message.replaceAll(Character.toString('\003') + "07", "ยง6");
-		message = message.replaceAll(Character.toString('\003') + "06", "ยง5");
-		message = message.replaceAll(Character.toString('\003') + "05", "ยง4");
-		message = message.replaceAll(Character.toString('\003') + "04", "ยงc");
-		message = message.replaceAll(Character.toString('\003') + "03", "ยง2");
-		message = message.replaceAll(Character.toString('\003') + "02", "ยง1");
-		message = message.replaceAll(Character.toString('\003') + "01", "ยง0");
-		message = message.replaceAll(Character.toString('\003') + "00", "ยงf");
-		message = message.replaceAll(Character.toString('\003') + "9", "ยงa");
-		message = message.replaceAll(Character.toString('\003') + "8", "ยงe");
-		message = message.replaceAll(Character.toString('\003') + "7", "ยง6");
-		message = message.replaceAll(Character.toString('\003') + "6", "ยง5");
-		message = message.replaceAll(Character.toString('\003') + "5", "ยง4");
-		message = message.replaceAll(Character.toString('\003') + "4", "ยงc");
-		message = message.replaceAll(Character.toString('\003') + "3", "ยง2");
-		message = message.replaceAll(Character.toString('\003') + "2", "ยง1");
-		message = message.replaceAll(Character.toString('\003') + "1", "ยง0");
-		message = message.replaceAll(Character.toString('\003') + "0", "ยงf");
-		message = message.replaceAll(Character.toString('\003'), "ยงr");
+		message = message.replaceAll("ง([^\\d+r])", "$1");
+		message = message.replaceAll("(" + Character.toString('\003')+ "\\d{2}),\\d{1,2}", "ง1");
+		message = message.replaceAll(Character.toString('\003') + "15", "ง7");
+		message = message.replaceAll(Character.toString('\003') + "14", "ง8");
+		message = message.replaceAll(Character.toString('\003') + "13", "งd");
+		message = message.replaceAll(Character.toString('\003') + "12", "ง9");
+		message = message.replaceAll(Character.toString('\003') + "11", "งb");
+		message = message.replaceAll(Character.toString('\003') + "10", "ง3");
+		message = message.replaceAll(Character.toString('\003') + "09", "งa");
+		message = message.replaceAll(Character.toString('\003') + "08", "งe");
+		message = message.replaceAll(Character.toString('\003') + "07", "ง6");
+		message = message.replaceAll(Character.toString('\003') + "06", "ง5");
+		message = message.replaceAll(Character.toString('\003') + "05", "ง4");
+		message = message.replaceAll(Character.toString('\003') + "04", "งc");
+		message = message.replaceAll(Character.toString('\003') + "03", "ง2");
+		message = message.replaceAll(Character.toString('\003') + "02", "ง1");
+		message = message.replaceAll(Character.toString('\003') + "01", "ง0");
+		message = message.replaceAll(Character.toString('\003') + "00", "งf");
+		message = message.replaceAll(Character.toString('\003') + "9", "งa");
+		message = message.replaceAll(Character.toString('\003') + "8", "งe");
+		message = message.replaceAll(Character.toString('\003') + "7", "ง6");
+		message = message.replaceAll(Character.toString('\003') + "6", "ง5");
+		message = message.replaceAll(Character.toString('\003') + "5", "ง4");
+		message = message.replaceAll(Character.toString('\003') + "4", "งc");
+		message = message.replaceAll(Character.toString('\003') + "3", "ง2");
+		message = message.replaceAll(Character.toString('\003') + "2", "ง1");
+		message = message.replaceAll(Character.toString('\003') + "1", "ง0");
+		message = message.replaceAll(Character.toString('\003') + "0", "งf");
+		message = message.replaceAll(Character.toString('\003'), "งr");
 		message = message.replaceAll(Character.toString('\002'), "");
-		message = message.replaceAll(Character.toString('\017'), "ยงr");
+		message = message.replaceAll(Character.toString('\017'), "งr");
 		message = message.replaceAll(Character.toString('\037'), "");
 		message = message.replaceAll(Character.toString('\035'), "");
 		message = message.replaceAll(Character.toString('\026'), "");
@@ -410,23 +408,23 @@ public class IRCBot extends IRCLib implements API {
 	}
 	
 	public static String stripColorsForIRC(String message) {
-		message = message.replaceAll("ยง7",Character.toString('\003') + "14");
-		message = message.replaceAll("ยง8",Character.toString('\003') + "14");
-		message = message.replaceAll("ยงd",Character.toString('\003') + "13");
-		message = message.replaceAll("ยง9",Character.toString('\003') + "12");
-		message = message.replaceAll("ยงb",Character.toString('\003') + "11");
-		message = message.replaceAll("ยง3",Character.toString('\003') + "10");
-		message = message.replaceAll("ยงa",Character.toString('\003') + "09");
-		message = message.replaceAll("ยงe",Character.toString('\003') + "08");
-		message = message.replaceAll("ยง6",Character.toString('\003') + "07");
-		message = message.replaceAll("ยง5",Character.toString('\003') + "06");
-		message = message.replaceAll("ยง4",Character.toString('\003') + "05");
-		message = message.replaceAll("ยงc",Character.toString('\003') + "04");
-		message = message.replaceAll("ยง2",Character.toString('\003') + "03");
-		message = message.replaceAll("ยง1",Character.toString('\003') + "02");
-		message = message.replaceAll("ยง0",Character.toString('\003') + "01");
-		message = message.replaceAll("ยงf",Character.toString('\003') + "00");
-		message = message.replaceAll("ยงr",Character.toString('\003'));
+		message = message.replaceAll("ง7",Character.toString('\003') + "14");
+		message = message.replaceAll("ง8",Character.toString('\003') + "14");
+		message = message.replaceAll("งd",Character.toString('\003') + "13");
+		message = message.replaceAll("ง9",Character.toString('\003') + "12");
+		message = message.replaceAll("งb",Character.toString('\003') + "11");
+		message = message.replaceAll("ง3",Character.toString('\003') + "10");
+		message = message.replaceAll("งa",Character.toString('\003') + "09");
+		message = message.replaceAll("งe",Character.toString('\003') + "08");
+		message = message.replaceAll("ง6",Character.toString('\003') + "07");
+		message = message.replaceAll("ง5",Character.toString('\003') + "06");
+		message = message.replaceAll("ง4",Character.toString('\003') + "05");
+		message = message.replaceAll("งc",Character.toString('\003') + "04");
+		message = message.replaceAll("ง2",Character.toString('\003') + "03");
+		message = message.replaceAll("ง1",Character.toString('\003') + "02");
+		message = message.replaceAll("ง0",Character.toString('\003') + "01");
+		message = message.replaceAll("งf",Character.toString('\003') + "00");
+		message = message.replaceAll("งr",Character.toString('\003'));
 
 		return message;
 	}
@@ -437,7 +435,7 @@ public class IRCBot extends IRCLib implements API {
 
 	static String colorNick(String n, String u, String h) {
 		if (TkIrc.ops.contains(n.toLowerCase())) {
-			return "ยง4" + n + "ยงr";
+			return "ง4" + n + "งr";
 		} else {
 			return n;
 		}

@@ -2,8 +2,10 @@ package alekso56.TkIrc;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AchievementEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
@@ -42,23 +44,37 @@ public class TkEvents {
     }
     
     @SubscribeEvent
-    public ServerChatEvent onSM(ServerChatEvent message) {
-        if(message.isCanceled()){return message;}
-            String sPrefix  = Config.pIRCMSG.replaceAll("%n", dePing(IRCBot.colorNick(message.username))) + " ";
-            TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
+	public ServerChatEvent onSM(ServerChatEvent message) {
+		if (message.isCanceled()) {return message;}
+		String sPrefix = Config.pIRCMSG.replaceAll("%n",dePing(IRCBot.colorNick(message.username)))+ " ";
+		TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
 
-      String[] aMessage = message.message.split(" ", 2);
+		String[] aMessage = message.message.split(" ", 2);
 
-      if (aMessage[0].matches("^<" + message.username + ">$"))
-      {
-          TkIrc.toIrc.sendMessage(Config.cName, aMessage[1]);
-      }
-      else if ((aMessage[0].matches("^\\*$")) && (aMessage[1].split(" ", 2)[0].matches(message.username)))
-      {
-          TkIrc.toIrc.sendAction(Config.cName, aMessage[1].split(" ", 2)[1]);
-      }
+		if (aMessage[0].matches("^<" + message.username + ">$")) {
+			TkIrc.toIrc.sendMessage(Config.cName, aMessage[1]);
+		} else if ((aMessage[0].matches("^\\*$")) && (aMessage[1].split(" ", 2)[0].matches(message.username))) {
+			TkIrc.toIrc.sendAction(Config.cName, aMessage[1].split(" ", 2)[1]);
+		}
 
-      return message;
+		return message;
+	}
+     
+    @SubscribeEvent
+    public void onCommand(CommandEvent c){
+		if ((c.command.getCommandName() == "me")) {
+			String sPrefix = Config.pIRCAction.replaceAll("%n",dePing(IRCBot.colorNick(c.sender.getCommandSenderName()))) + " ";
+			TkIrc.toIrc.sendMessage(Config.cName,sPrefix + c.parameters[0]);
+			return;
+		}
+		if (c.command.getCommandName() == "nick"){c.setCanceled(true);}
+    }
+    
+    @SubscribeEvent
+    public void onAchievement(AchievementEvent a){
+    	if(a.achievement.isAchievement()){
+    		TkIrc.toIrc.sendMessage(Config.cName,dePing(IRCBot.colorNick(a.entityPlayer.getCommandSenderName()))+" has just earned the achievement [\""+a.achievement.func_150951_e().getUnformattedText()+"\"]");
+    	}
     }
     
     @SubscribeEvent

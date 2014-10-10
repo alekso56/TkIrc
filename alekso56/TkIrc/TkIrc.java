@@ -16,7 +16,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.5", dependencies = "required-after:Forge@[10.12.0.967,]")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.6", dependencies = "required-after:Forge@[10.12.0.967,]",canBeDeactivated = true,acceptableRemoteVersions = "*")
 public class TkIrc {
 	protected static Configuration config;
 	public static IRCLib toIrc;
@@ -41,7 +41,6 @@ public class TkIrc {
 	public void serverStart(FMLServerStartingEvent event) 
 	{
 		event.registerServerCommand(new TkHQ());
-		event.registerServerCommand(new TkHQ2());
 		 MinecraftForge.EVENT_BUS.register(new TkEvents());
 		 FMLCommonHandler.instance().bus().register(new TkEvents());
 		 TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
@@ -56,7 +55,6 @@ public class TkIrc {
 
 		toIrc = new IRCBot();
 		toIrc.setUser(proxy.botUser());
-
 		if ((!Config.nUser.isEmpty()) && (!Config.nKey.isEmpty())) {
 			toIrc.setSASLUser(Config.nUser);
 			toIrc.setSASLPass(Config.nKey);
