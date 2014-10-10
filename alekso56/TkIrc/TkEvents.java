@@ -59,8 +59,8 @@ public class TkEvents {
 
 		return message;
 	}
-     
-    @SubscribeEvent
+    
+	@SubscribeEvent
     public void onCommand(CommandEvent c){
 		if ((c.command.getCommandName() == "me")) {
 			String sPrefix = Config.pIRCAction.replaceAll("%n",dePing(IRCBot.colorNick(c.sender.getCommandSenderName()))) + " ";
@@ -76,6 +76,18 @@ public class TkEvents {
     		TkIrc.toIrc.sendMessage(Config.cName,dePing(IRCBot.colorNick(a.entityPlayer.getCommandSenderName()))+" has just earned the achievement [\""+a.achievement.func_150951_e().getUnformattedText()+"\"]");
     	}
     }
+
+    private static String dePing(String sPlayer) {
+    	sPlayer = IRCBot.Scoreboard(sPlayer, true);
+		if (Config.depinger && sPlayer.length() >= 2) {
+			String Player = sPlayer.substring(0,sPlayer.length()/2)
+					+ Character.toString('\u200B')
+					+ sPlayer.substring(sPlayer.length()/2);
+			return Player;
+		} else {
+			return sPlayer;
+		}
+	}
     
     @SubscribeEvent
     public void onPlayerLogin(PlayerLoggedInEvent player) {
@@ -97,16 +109,4 @@ public class TkEvents {
             TkIrc.toIrc.sendMessage(Config.cName, "* " + dePing(player.player.getDisplayName()) + " has left the game");
         }
     }
-
-    private static String dePing(String sPlayer) {
-    	sPlayer = IRCBot.Scoreboard(sPlayer, true);
-		if (Config.depinger && sPlayer.length() >= 2) {
-			String Player = sPlayer.substring(0,sPlayer.length()/2)
-					+ Character.toString('\u200B')
-					+ sPlayer.substring(sPlayer.length()/2);
-			return Player;
-		} else {
-			return sPlayer;
-		}
-	}
 }

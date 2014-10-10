@@ -18,11 +18,7 @@ public String getCommandUsage(ICommandSender par1iCommandSender)
   {
     return "/" + getCommandName() + " help";
   }
-  @Override
-public boolean canCommandSenderUseCommand(ICommandSender par1iCommandSender)
-  {
-    return super.canCommandSenderUseCommand(par1iCommandSender);
-  }
+  
 @Override
 public void processCommand(ICommandSender icommandsender, String[] astring) {
 		    if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban")); return;}
@@ -49,7 +45,6 @@ public void processCommand(ICommandSender icommandsender, String[] astring) {
 		      TkIrc.toIrc.sendRaw("MODE " + Config.cName + " -b " + astring[1] + "!*@*");
 		    }
               else if ((astring[0].equalsIgnoreCase("help")) && (astring.length > 0)) {
-            	  icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban"));
-  }
-}
+            	  icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban")); }
+ }
 }

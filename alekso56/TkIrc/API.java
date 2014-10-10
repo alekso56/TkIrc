@@ -6,7 +6,7 @@ package alekso56.TkIrc;
  */
 public interface API {
 	public boolean isAuthed(String username,String channel);
-	
+ 
 	public void onConnected();
 	
 	public void onNick(String oldNick, String newNick);

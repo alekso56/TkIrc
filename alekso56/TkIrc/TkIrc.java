@@ -40,10 +40,13 @@ public class TkIrc {
 	@Mod.EventHandler
 	public void serverStart(FMLServerStartingEvent event) 
 	{
-		event.registerServerCommand(new TkHQ());
+		if (!Config.enabled) {
+			return;
+		}
+		 event.registerServerCommand(new TkHQ());
 		 MinecraftForge.EVENT_BUS.register(new TkEvents());
 		 FMLCommonHandler.instance().bus().register(new TkEvents());
-		 TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
+		 toIrc.joinChannel(Config.cName, Config.cKey);
 	}
 
 
