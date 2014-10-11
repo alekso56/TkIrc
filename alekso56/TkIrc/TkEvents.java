@@ -77,7 +77,7 @@ public class TkEvents {
     	}
     }
 
-    private static String dePing(String sPlayer) {
+    static String dePing(String sPlayer) {
     	sPlayer = IRCBot.Scoreboard(sPlayer, true);
 		if (Config.depinger && sPlayer.length() >= 2) {
 			String Player = sPlayer.substring(0,sPlayer.length()/2)
@@ -88,25 +88,4 @@ public class TkEvents {
 			return sPlayer;
 		}
 	}
-    
-    @SubscribeEvent
-    public void onPlayerLogin(PlayerLoggedInEvent player) {
-        if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
-            TkIrc.toIrc.joinChannel(Config.cName, Config.cKey);
-        }
-        if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* "+ dePing(player.player.getDisplayName()) +" has joined the game");
-        }
-    }
-    
-    @SubscribeEvent
-    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent player) {
-        if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
-            TkIrc.toIrc.joinChannel("0");
-        }
-
-        if (Config.eJoinMC) {
-            TkIrc.toIrc.sendMessage(Config.cName, "* " + dePing(player.player.getDisplayName()) + " has left the game");
-        }
-    }
 }

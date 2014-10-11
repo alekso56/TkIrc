@@ -369,37 +369,37 @@ public class IRCBot extends IRCLib implements API {
 	}
 
 	public static String stripColorsForMC(String message) {
-		message = message.replaceAll("�([^\\d+r])", "$1");
-		message = message.replaceAll("(" + Character.toString('\003')+ "\\d{2}),\\d{1,2}", "�1");
-		message = message.replaceAll(Character.toString('\003') + "15", "�7");
-		message = message.replaceAll(Character.toString('\003') + "14", "�8");
-		message = message.replaceAll(Character.toString('\003') + "13", "�d");
-		message = message.replaceAll(Character.toString('\003') + "12", "�9");
-		message = message.replaceAll(Character.toString('\003') + "11", "�b");
-		message = message.replaceAll(Character.toString('\003') + "10", "�3");
-		message = message.replaceAll(Character.toString('\003') + "09", "�a");
-		message = message.replaceAll(Character.toString('\003') + "08", "�e");
-		message = message.replaceAll(Character.toString('\003') + "07", "�6");
-		message = message.replaceAll(Character.toString('\003') + "06", "�5");
-		message = message.replaceAll(Character.toString('\003') + "05", "�4");
-		message = message.replaceAll(Character.toString('\003') + "04", "�c");
-		message = message.replaceAll(Character.toString('\003') + "03", "�2");
-		message = message.replaceAll(Character.toString('\003') + "02", "�1");
-		message = message.replaceAll(Character.toString('\003') + "01", "�0");
-		message = message.replaceAll(Character.toString('\003') + "00", "�f");
-		message = message.replaceAll(Character.toString('\003') + "9", "�a");
-		message = message.replaceAll(Character.toString('\003') + "8", "�e");
-		message = message.replaceAll(Character.toString('\003') + "7", "�6");
-		message = message.replaceAll(Character.toString('\003') + "6", "�5");
-		message = message.replaceAll(Character.toString('\003') + "5", "�4");
-		message = message.replaceAll(Character.toString('\003') + "4", "�c");
-		message = message.replaceAll(Character.toString('\003') + "3", "�2");
-		message = message.replaceAll(Character.toString('\003') + "2", "�1");
-		message = message.replaceAll(Character.toString('\003') + "1", "�0");
-		message = message.replaceAll(Character.toString('\003') + "0", "�f");
-		message = message.replaceAll(Character.toString('\003'), "�r");
+		message = message.replaceAll("§([^\\d+r])", "$1");
+		message = message.replaceAll("(" + Character.toString('\003')+ "\\d{2}),\\d{1,2}", "§1");
+		message = message.replaceAll(Character.toString('\003') + "15", "§7");
+		message = message.replaceAll(Character.toString('\003') + "14", "§8");
+		message = message.replaceAll(Character.toString('\003') + "13", "§d");
+		message = message.replaceAll(Character.toString('\003') + "12", "§9");
+		message = message.replaceAll(Character.toString('\003') + "11", "§b");
+		message = message.replaceAll(Character.toString('\003') + "10", "§3");
+		message = message.replaceAll(Character.toString('\003') + "09", "§a");
+		message = message.replaceAll(Character.toString('\003') + "08", "§e");
+		message = message.replaceAll(Character.toString('\003') + "07", "§6");
+		message = message.replaceAll(Character.toString('\003') + "06", "§5");
+		message = message.replaceAll(Character.toString('\003') + "05", "§4");
+		message = message.replaceAll(Character.toString('\003') + "04", "§c");
+		message = message.replaceAll(Character.toString('\003') + "03", "§2");
+		message = message.replaceAll(Character.toString('\003') + "02", "§1");
+		message = message.replaceAll(Character.toString('\003') + "01", "§0");
+		message = message.replaceAll(Character.toString('\003') + "00", "§f");
+		message = message.replaceAll(Character.toString('\003') + "9", "§a");
+		message = message.replaceAll(Character.toString('\003') + "8", "§e");
+		message = message.replaceAll(Character.toString('\003') + "7", "§6");
+		message = message.replaceAll(Character.toString('\003') + "6", "§5");
+		message = message.replaceAll(Character.toString('\003') + "5", "§4");
+		message = message.replaceAll(Character.toString('\003') + "4", "§c");
+		message = message.replaceAll(Character.toString('\003') + "3", "§2");
+		message = message.replaceAll(Character.toString('\003') + "2", "§1");
+		message = message.replaceAll(Character.toString('\003') + "1", "§0");
+		message = message.replaceAll(Character.toString('\003') + "0", "§f");
+		message = message.replaceAll(Character.toString('\003'), "§r");
 		message = message.replaceAll(Character.toString('\002'), "");
-		message = message.replaceAll(Character.toString('\017'), "�r");
+		message = message.replaceAll(Character.toString('\017'), "§r");
 		message = message.replaceAll(Character.toString('\037'), "");
 		message = message.replaceAll(Character.toString('\035'), "");
 		message = message.replaceAll(Character.toString('\026'), "");
@@ -408,23 +408,23 @@ public class IRCBot extends IRCLib implements API {
 	}
 	
 	public static String stripColorsForIRC(String message) {
-		message = message.replaceAll("�7",Character.toString('\003') + "14");
-		message = message.replaceAll("�8",Character.toString('\003') + "14");
-		message = message.replaceAll("�d",Character.toString('\003') + "13");
-		message = message.replaceAll("�9",Character.toString('\003') + "12");
-		message = message.replaceAll("�b",Character.toString('\003') + "11");
-		message = message.replaceAll("�3",Character.toString('\003') + "10");
-		message = message.replaceAll("�a",Character.toString('\003') + "09");
-		message = message.replaceAll("�e",Character.toString('\003') + "08");
-		message = message.replaceAll("�6",Character.toString('\003') + "07");
-		message = message.replaceAll("�5",Character.toString('\003') + "06");
-		message = message.replaceAll("�4",Character.toString('\003') + "05");
-		message = message.replaceAll("�c",Character.toString('\003') + "04");
-		message = message.replaceAll("�2",Character.toString('\003') + "03");
-		message = message.replaceAll("�1",Character.toString('\003') + "02");
-		message = message.replaceAll("�0",Character.toString('\003') + "01");
-		message = message.replaceAll("�f",Character.toString('\003') + "00");
-		message = message.replaceAll("�r",Character.toString('\003'));
+		message = message.replaceAll("§7",Character.toString('\003') + "14");
+		message = message.replaceAll("§8",Character.toString('\003') + "14");
+		message = message.replaceAll("§d",Character.toString('\003') + "13");
+		message = message.replaceAll("§9",Character.toString('\003') + "12");
+		message = message.replaceAll("§b",Character.toString('\003') + "11");
+		message = message.replaceAll("§3",Character.toString('\003') + "10");
+		message = message.replaceAll("§a",Character.toString('\003') + "09");
+		message = message.replaceAll("§e",Character.toString('\003') + "08");
+		message = message.replaceAll("§6",Character.toString('\003') + "07");
+		message = message.replaceAll("§5",Character.toString('\003') + "06");
+		message = message.replaceAll("§4",Character.toString('\003') + "05");
+		message = message.replaceAll("§c",Character.toString('\003') + "04");
+		message = message.replaceAll("§2",Character.toString('\003') + "03");
+		message = message.replaceAll("§1",Character.toString('\003') + "02");
+		message = message.replaceAll("§0",Character.toString('\003') + "01");
+		message = message.replaceAll("§f",Character.toString('\003') + "00");
+		message = message.replaceAll("§r",Character.toString('\003'));
 
 		return message;
 	}
@@ -435,7 +435,7 @@ public class IRCBot extends IRCLib implements API {
 
 	static String colorNick(String n, String u, String h) {
 		if (TkIrc.ops.contains(n.toLowerCase())) {
-			return "�4" + n + "�r";
+			return "§4" + n + "§r";
 		} else {
 			return n;
 		}
