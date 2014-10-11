@@ -44,8 +44,8 @@ public class TkEvents {
     }
     
     @SubscribeEvent
-	public ServerChatEvent onSM(ServerChatEvent message) {
-		if (message.isCanceled()) {return message;}
+	public void onSM(ServerChatEvent message) {
+		if (message.isCanceled()) {return;}
 		String sPrefix = Config.pIRCMSG.replaceAll("%n",dePing(IRCBot.colorNick(message.username)))+ " ";
 		TkIrc.toIrc.sendMessage(Config.cName, sPrefix + message.message);
 
@@ -57,7 +57,7 @@ public class TkEvents {
 			TkIrc.toIrc.sendAction(Config.cName, aMessage[1].split(" ", 2)[1]);
 		}
 
-		return message;
+		return;
 	}
     
 	@SubscribeEvent
@@ -72,7 +72,7 @@ public class TkEvents {
     
     @SubscribeEvent
     public void onAchievement(AchievementEvent a){
-    	if(a.achievement.isAchievement()){
+    	if(!a.achievement.isAchievement()){
     		TkIrc.toIrc.sendMessage(Config.cName,dePing(IRCBot.colorNick(a.entityPlayer.getCommandSenderName()))+" has just earned the achievement [\""+a.achievement.func_150951_e().getUnformattedText()+"\"]");
     	}
     }
