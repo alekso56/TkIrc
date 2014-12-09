@@ -1,12 +1,15 @@
 package alekso56.TkIrc;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AchievementEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -62,9 +65,11 @@ public class TkEvents {
     
 	@SubscribeEvent
     public void onCommand(CommandEvent c){
-		if ((c.command.getCommandName() == "me")) {
+		if ((c.command.getCommandName() == "me") && c.parameters.length >= 1) {
 			String sPrefix = Config.pIRCAction.replaceAll("%n",dePing(IRCBot.colorNick(c.sender.getCommandSenderName()))) + " ";
-			TkIrc.toIrc.sendMessage(Config.cName,sPrefix + c.parameters[0]);
+			String msg = c.parameters[0];
+			for (int curr = 1;curr < c.parameters.length;curr = curr+1) {msg = msg+" "+c.parameters[curr];}
+			TkIrc.toIrc.sendMessage(Config.cName,sPrefix + msg);
 			return;
 		}
 		if (c.command.getCommandName() == "nick"){c.setCanceled(true);}
@@ -72,8 +77,11 @@ public class TkEvents {
     
     @SubscribeEvent
     public void onAchievement(AchievementEvent a){
-    	if(!a.achievement.isAchievement()){
-    		TkIrc.toIrc.sendMessage(Config.cName,dePing(IRCBot.colorNick(a.entityPlayer.getCommandSenderName()))+" has just earned the achievement [\""+a.achievement.func_150951_e().getUnformattedText()+"\"]");
+    	if(Config.Achievements){
+    	StatisticsFile player = ((EntityPlayerMP) a.entityPlayer).func_147099_x();
+    	if(a.achievement.isAchievement() && player.canUnlockAchievement(a.achievement) && !player.hasAchievementUnlocked(a.achievement)){
+    		TkIrc.toIrc.sendMessage(Config.cName,dePing(IRCBot.colorNick(a.entityPlayer.getCommandSenderName()))+" has just earned the achievement \""+a.achievement.func_150951_e().getUnformattedText()+"\"");
+    	}
     	}
     }
 

@@ -18,6 +18,7 @@ public class Config
   static final String TWITCH = "Twitch";
   static final String GENERAL = "general";
   static boolean enabled;
+  static boolean Achievements;
   static boolean depinger;
   static boolean scoreboardColors;
   static String botName;
@@ -51,6 +52,7 @@ public class Config
     opColor = config.get("general", "opColor", "e").getString();
     config.get("general", "opColor", "e").comment = "Color code for OPs on your server. r = no color. Uses minecraft colors";
     enabled = config.get("general", "ircEnabled", false).getBoolean(false);
+    Achievements = config.get("general", "AchievementsEnabled", true).getBoolean(true);
     scoreboardColors = config.get("general", "ScoreboardColorsInIRCMSGS", false).getBoolean(false);
     
     sHost = config.get("Server", "hostname", "irc.esper.net").getString();

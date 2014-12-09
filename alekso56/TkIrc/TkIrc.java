@@ -16,7 +16,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.6.2", dependencies = "required-after:Forge@[10.12.0.967,]",acceptableRemoteVersions = "*")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.6.4", dependencies = "required-after:Forge@[10.12.0.967,]",acceptableRemoteVersions = "*")
 public class TkIrc {
 	protected static Configuration config;
 	public static IRCLib toIrc;
