@@ -28,7 +28,7 @@ public class TkEvents {
 
         if ((event.entityLiving instanceof EntityPlayer)) {
             String dmsg = StatCollector.translateToLocalFormatted("death.attack." + event.source.damageType,
-                              new Object[] { event.entityLiving.getCommandSenderName(),
+                              new Object[] { dePing(event.entityLiving.getCommandSenderName()),
                                              s });
             
             String cdmsg = (String) Config.mDeathMessages.get("death." + event.source.damageType);

@@ -32,14 +32,13 @@ public class TkHQ extends CommandBase
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public List getCommandAliases() {
 		return null;
 	}
 	@Override
 	public void processCommand(ICommandSender icommandsender, String[] astring) {
-		if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban")); return;}
+		if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect")); return;}
 		if (astring[0].equalsIgnoreCase("reconnect")) {
 			try {
 				TkIrc.toIrc.close();
@@ -55,14 +54,8 @@ public class TkHQ extends CommandBase
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else if ((astring[0].equalsIgnoreCase("kick")) && (astring.length > 0)) {
-			TkIrc.toIrc.sendRaw("KICK " + Config.cName + " " + astring[1]);
-		} else if ((astring[0].equalsIgnoreCase("ban")) && (astring.length > 0)) {
-			TkIrc.toIrc.sendRaw("MODE " + Config.cName + " +b " + astring[1] + "!*@*");
-		} else if ((astring[0].equalsIgnoreCase("unban")) && (astring.length > 0)) {
-			TkIrc.toIrc.sendRaw("MODE " + Config.cName + " -b " + astring[1] + "!*@*");
 		}
 		else if ((astring[0].equalsIgnoreCase("help")) && (astring.length > 0)) {
-			icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect,kick,ban,unban")); }
+			icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect")); }
 	}
 }
