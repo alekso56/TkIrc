@@ -4,19 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.ListIterator;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
 import alekso56.TkIrc.irclib.IRCLib;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 
-@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.6.5", dependencies = "required-after:Forge@[10.12.0.967,]",acceptableRemoteVersions = "*")
+@Mod(modid = "TKIRC", name = "TK-IRC", version = "2.6.6", dependencies = "required-after:Forge@[10.12.0.967,]",acceptableRemoteVersions = "*")
 public class TkIrc {
 	protected static Configuration config;
 	public static IRCLib toIrc;
@@ -55,14 +57,28 @@ public class TkIrc {
 		if ((!Config.enabled) || (toIrc != null)) {
 			return;
 		}
-
+        
+		reconnectBot(true);
+		commands = toIrc.loadcmd();
+	}
+	
+	public static void reconnectBot(boolean init){
+		if(!init){
+		try {
+			TkIrc.toIrc.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		}
 		toIrc = new IRCBot();
+		toIrc.initialTimer();
 		toIrc.setUser(proxy.botUser());
 		if ((!Config.nUser.isEmpty()) && (!Config.nKey.isEmpty())) {
 			toIrc.setSASLUser(Config.nUser);
 			toIrc.setSASLPass(Config.nKey);
 		}
-
+ 
 		toIrc.setInfo("TkIRc");
 
 		try {
@@ -76,7 +92,23 @@ public class TkIrc {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		commands = toIrc.loadcmd();
+	}
+
+	public static String combinedModList() {
+		ListIterator data = Loader.instance().getModList().listIterator();
+		String parsedData = "";
+		while (data.hasNext()) {
+			String tempData = data.next().toString();
+			if (tempData.startsWith("FMLMod:")) {
+				tempData = tempData.substring(7);
+				if (data.hasNext()) {
+					parsedData = parsedData + tempData + ",";
+				} else {
+					parsedData = parsedData + tempData + ".";
+				}
+			}
+		}
+		return parsedData;
 	}
 
 	public static void FakeCrash(String d){

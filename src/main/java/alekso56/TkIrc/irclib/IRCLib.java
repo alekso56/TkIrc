@@ -16,13 +16,15 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import alekso56.TkIrc.TkIrc;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import alekso56.TkIrc.TkIrc;
 
 public class IRCLib extends Thread {
 	protected boolean bConnected;
@@ -38,7 +40,8 @@ public class IRCLib extends Thread {
 	protected Socket socket;
 	public BufferedWriter out;
 	public BufferedReader in;
-
+    public static magicTimer timer = new magicTimer();
+    
 	public boolean connect(String s, Integer p) throws IOException {
 		if (this.sNick == null)
 			return false;
@@ -150,6 +153,8 @@ public class IRCLib extends Thread {
 	protected void process(String line) {
 		if (line.toUpperCase().startsWith("PING ")) {
 			sendRaw("PONG " + line.substring(5));
+			 magicTimer.reschedule(10*60*1000);
+			// System.out.println("delayed timer by 10 minutes");
 		} else if (line.toUpperCase().startsWith("AUTHENTICATE +")) {
 			sendRaw("AUTHENTICATE " + getSASL(this.SASLUser, this.SASLPass));
 		} else {
@@ -449,6 +454,8 @@ public class IRCLib extends Thread {
 		}
 
 	}
+	
+	
 
 	public void savecmd() {
 		try {
@@ -475,4 +482,28 @@ public class IRCLib extends Thread {
 		}
 		return TkIrc.commands;
 	}
+	public void initialTimer(){
+        timer.schedule(new TimerTask(){ public void run() {
+	    TkIrc.reconnectBot(false);
+	    timer.cancel();
+	  }
+	}, 10*60*1000);
+   }
 }
+class magicTimer extends Timer {
+	  private static Runnable task;
+	  private static TimerTask timerTask;
+	  private static Timer timer = new Timer();
+	  public void schedule(Runnable runnable, long delay) {
+	    task = runnable;
+	    timerTask = new TimerTask() { public void run() { task.run(); }};
+	    timer.schedule(timerTask, delay);        
+	  }
+
+	  public static void reschedule(long delay) {
+		if(timerTask != null)
+	    timerTask.cancel();
+	    timerTask = new TimerTask() { public void run() { task.run(); }};
+	    timer.schedule(timerTask, delay);        
+	  }
+	}

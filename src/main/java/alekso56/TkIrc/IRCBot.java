@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Iterator;
 
+import alekso56.TkIrc.irclib.Base64;
+import alekso56.TkIrc.irclib.IRCLib;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.DimensionManager;
-import alekso56.TkIrc.irclib.Base64;
-import alekso56.TkIrc.irclib.IRCLib;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import java.util.Date;
 
 public class IRCBot extends IRCLib implements API {
 	private static final String bs = Character.toString('\u00A7');
-	
+	private static boolean isUserCommandsEnabled = true;
 	private double timeFormat(long[] par1ArrayOfLong) {
 		long time = 0L;
 		long[] var4 = par1ArrayOfLong;
@@ -32,9 +33,10 @@ public class IRCBot extends IRCLib implements API {
 	}
 
 	@Override
-	public boolean isAuthed(String username,String d) {
+	public boolean isAuthed(String username, String nick) {
 		if (TkIrc.ops.contains(username.toLowerCase())) {
 			String authnum = "0";
+			//check nickserv
 			try {
 				TkIrc.toIrc.sendRaw("NickServ ACC " + username);
 				String response = TkIrc.toIrc.in.readLine();
@@ -42,27 +44,30 @@ public class IRCBot extends IRCLib implements API {
 				authnum = parted[5];
 
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			if (authnum.equals("3")) {
 				return true;
 			}
 		}
+		//first check failed, try names
 		try {
-			TkIrc.toIrc.sendRaw("names "+Config.cName);
+			TkIrc.toIrc.sendRaw("names " + Config.cName);
 			String response = TkIrc.toIrc.in.readLine();
 			String[] parted = response.split(" ");
-			for (int curr = 0;curr<parted.length; curr++) {
-				if(parted[curr].startsWith("@") && parted[curr].contains(username)){
+			for (int curr = 0; curr < parted.length; curr++) {
+				if (parted[curr].startsWith("@") && parted[curr].contains(username)) {
 					return true;
 				}
 			}
-            
+
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (nick != null) {
+				TkIrc.toIrc.sendMessage(nick, "Both NS and names failed to work. This is a critical error.");
+			}
 		}
-		if (d != null){
-		 TkIrc.toIrc.sendMessage(d, "ACCESS DENIED!: not authorized");
+		if (nick != null) {
+			TkIrc.toIrc.sendMessage(nick, "ACCESS DENIED!: not authorized");
 		}
 		return false;
 	}
@@ -81,8 +86,10 @@ public class IRCBot extends IRCLib implements API {
 		}
 		else{m = m.substring(Config.prefixforirccommands.length());}
 		
-		if (m.startsWith("players")
-				&& (Side.SERVER == FMLCommonHandler.instance().getSide())) {
+		
+	    if(!isUserCommandsEnabled){if(!isAuthed(usr,nick)){return;}}
+
+		if (m.startsWith("players") && (Side.SERVER == FMLCommonHandler.instance().getSide())) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
 			String lPlayers = aPlayers.length == 0 ? "None." : "";
 
@@ -99,14 +106,23 @@ public class IRCBot extends IRCLib implements API {
 					TkIrc.toIrc.sendMessage(nick, out);
 			return;
 		}
-
+		if (m.startsWith("tUserCommands") && isAuthed(usr,nick)) {
+			if(isUserCommandsEnabled){isUserCommandsEnabled = false;}else{isUserCommandsEnabled = true;}
+			TkIrc.toIrc.sendNotice(nick, "Toggled user commands to "+isUserCommandsEnabled);
+			return;
+		}
+		if (m.startsWith("tAchievements") && isAuthed(usr,nick)) {
+			if(Config.Achievements){Config.Achievements = false;}else{Config.Achievements = true;}
+			TkIrc.toIrc.sendNotice(nick, "Toggled Achievements to "+Config.Achievements);
+			return;
+		}
 		if (m.startsWith("status")) {
 			TkIrc.toIrc.sendMessage(nick, TkIrc.toIrc.getrawurle());
 			return;
 		}
 		if (m.startsWith("help")) {
-	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| base64| ";
-		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| ";}
+	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| base64| moddir| rainbow| ";
+		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| tUserCommands| tAchievements| ";}
 		 Iterator<String> commands = TkIrc.commands.keySet().iterator();
 	 	 while (commands.hasNext()){
 			String current = commands.next();
@@ -116,7 +132,13 @@ public class IRCBot extends IRCLib implements API {
 		 return;
 		}
 		if(m.startsWith("base64") && m.length() > 8){
-			TkIrc.toIrc.sendMessage(nick, Base64.encode(m.substring(5)));
+			TkIrc.toIrc.sendMessage(nick, Base64.encode(m.substring(7)));
+		}
+		if(m.startsWith("moddir")){
+			TkIrc.toIrc.sendNotice(nick, TkIrc.combinedModList());
+		}
+		if(m.startsWith("rainbow") && m.length() > 8){
+			TkIrc.toIrc.sendMessage(nick, colorRainbow(m.substring(8)));
 		}
 		if (m.startsWith("tps")) {
 			StringBuilder out = new StringBuilder();
@@ -294,18 +316,18 @@ public class IRCBot extends IRCLib implements API {
 
 	@Override
 	public void onCTCP(String n, String u, String h, String d, String m) {
-		if (m.split(" ")[0].equals("VERSION")) {
-			sendCTCPReply(n, "Personal TKserver 0.3");
+		if (m.split(" ")[0].equals("VERSION") || m.split(" ")[0].equals("CLIENTINFO")) {
+			sendCTCPReply(n, "VERSION Personal TKserver 0.4");
 		}
 
 		if (m.split(" ")[0].equals("TIME")) {
 			sendCTCPReply(n,
-					"My internal clock is broken, plz donate ;_;");
+					"TIME "+new Date().toString());
 		}
 
 		if (m.split(" ")[0].equals("SOURCE")) {
 			sendCTCPReply(n,
-					"Wait, i got this... a source is some kind of document right?");
+					"SOURCE Wait, i got this... a source is some kind of document right?");
 		}
 
 		if (m.split(" ")[0].equals("PAGE")) {
@@ -313,11 +335,23 @@ public class IRCBot extends IRCLib implements API {
 					n,
 					"PAGE i have just thrown your page into the trash bin, was it something important?");
 		}
+		
+		if (m.split(" ")[0].equals("FINGER")) {
+			sendCTCPReply(
+					n,
+					"FINGER kinky!");
+		}
 
 		if (m.split(" ")[0].equals("USERINFO")) {
 			sendCTCPReply(
 					n,
-					"Gender=Female; yeah, i have a gender! who said servers can't have genders!");
+					"USERINFO Gender=Female; yeah, i have a gender! who said servers can't have genders!");
+		}
+		
+		if (m.split(" ")[0].equals("PING")) {
+			sendCTCPReply(
+					n,
+					"PING "+m.split(" ")[1]);
 		}
 	}
 
@@ -429,6 +463,35 @@ public class IRCBot extends IRCLib implements API {
 		message = message.replaceAll(bs+"r",Character.toString('\003'));
 
 		return message;
+	}
+	
+	static int randomWithRange(int min, int max)
+	{
+	   int range = (max - min) + 1;     
+	   return (int)(Math.random() * range) + min;
+	}
+	
+	static String colorRainbow(String msg){
+		String[] colors = new String[14];
+		colors[13] = Character.toString('\003') + "14";
+		colors[12] = Character.toString('\003') + "13";
+		colors[11] = Character.toString('\003') + "12";
+		colors[10] = Character.toString('\003') + "11";
+		colors[9] = Character.toString('\003') + "10";
+		colors[8] = Character.toString('\003') + "09";
+		colors[7] = Character.toString('\003') + "08";
+		colors[6] = Character.toString('\003') + "07";
+		colors[5] = Character.toString('\003') + "06";
+		colors[4] = Character.toString('\003') + "05";
+		colors[3] = Character.toString('\003') + "04";
+		colors[2] = Character.toString('\003') + "03";
+		colors[1] = Character.toString('\003') + "02";
+		colors[0] = Character.toString('\003') + "01";
+		StringBuilder buildstring = new StringBuilder();
+		for (int i = 0;i < msg.length(); i++){
+		    buildstring.append(colors[randomWithRange(0,13)]+Character.toString(msg.charAt(i)));
+		}
+		return buildstring.toString();
 	}
 
 	static String colorNick(String n) {
