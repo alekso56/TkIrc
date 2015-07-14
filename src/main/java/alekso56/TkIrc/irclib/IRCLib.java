@@ -76,9 +76,11 @@ public class IRCLib extends Thread {
 		return connect(s, p);
 	}
 
-	public void close() throws IOException {
+	public void close() {
 		this.bConnected = false;
-		this.socket.close();
+		if(this.socket != null){
+			try {this.socket.close();} catch (IOException e) {}
+		}
 	}
 
 	public String getServer() {
@@ -483,11 +485,12 @@ public class IRCLib extends Thread {
 		return TkIrc.commands;
 	}
 	public void initialTimer(){
-        timer.schedule(new TimerTask(){ public void run() {
-	    TkIrc.reconnectBot(false);
-	    timer.cancel();
-	  }
-	}, 10*60*1000);
+      timer.schedule(new TimerTask(){ 
+       public void run() {
+	     TkIrc.reconnectBot(false);
+	     timer.cancel();
+	   }
+	  }, 10*60*1000);
    }
 }
 class magicTimer extends Timer {

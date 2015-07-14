@@ -7,7 +7,7 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
-public class TkIrcCommandsender implements ICommandSender {
+public class TkIrcCommandsender implements ICommandSender,EntityPlayer {
     private StringBuffer buffer = new StringBuffer();
 	@Override
 	public String getCommandSenderName() {return "TKI";}

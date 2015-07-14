@@ -72,13 +72,13 @@ public class IRCBot extends IRCLib implements API {
 	}
 
 	@Override
-	public void onMessage(String usr, String u, String h, String nick, String m) {
+	public void onMessage(String usernames, String u, String h, String Channel, String m) {
 		if(!m.startsWith(Config.prefixforirccommands)){
-			usr = colorNick(usr, u, h);
-			if (nick.equals(this.sNick)) {
-				mcMessage(usr, m,true);
+			usernames = colorNick(usernames, u, h);
+			if (Channel.equals(this.sNick)) {
+				mcMessage(usernames, m,true);
 			} else {
-				String sPrefix = Config.pIngameMSG.replaceAll("%c", nick).replaceAll("%n", usr)+ " ";
+				String sPrefix = Config.pIngameMSG.replaceAll("%c", Channel).replaceAll("%n", usernames)+ " ";
 				mcMessage(sPrefix, m,false);
 			}
 			return;
@@ -86,7 +86,9 @@ public class IRCBot extends IRCLib implements API {
 		else{m = m.substring(Config.prefixforirccommands.length());}
 		m = m.toLowerCase();
 		
-	    if(!Config.IsUserCommandsEnabled){if(!isAuthed(usr,nick)){return;}}
+	    if(!Config.IsUserCommandsEnabled && !isAuthed(usernames,null)){
+	    		return;
+	    }
 
 		if (m.startsWith("players") && (Side.SERVER == FMLCommonHandler.instance().getSide())) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
@@ -98,7 +100,7 @@ public class IRCBot extends IRCLib implements API {
 								.append(", ").append(sPlayer).toString());
 			}
 			 if(lPlayers.length() <= 400){
-			     TkIrc.toIrc.sendMessage(nick, lPlayers);}
+			     TkIrc.toIrc.sendMessage(Channel, lPlayers);}
 			 else{
 				 int last = 0;
 					for (int i = 0; i < lPlayers.length();)
@@ -107,106 +109,106 @@ public class IRCBot extends IRCLib implements API {
 						{
 							last = i;
 							i += 400;
-							TkIrc.toIrc.sendNotice(nick, lPlayers.substring(last, i));	
+							TkIrc.toIrc.sendNotice(Channel, lPlayers.substring(last, i));	
 						}
 					}
 			 }
             }else{
-             TkIrc.toIrc.sendMessage(nick, "Too many players present.");
+             TkIrc.toIrc.sendMessage(Channel, "Too many players present.");
             }
 			return;
 		}
-		if (m.startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 && !m.substring(1).startsWith("me")) {
+		if (m.startsWith("c ")&&isAuthed(usernames,Channel)&&m.length() >=  2 && !m.substring(1).startsWith("me")) {
 			TkIrcCommandsender tki = new TkIrcCommandsender();
 			tki.resetLog();
 			MinecraftServer.getServer().getCommandManager().executeCommand(tki, m.substring(1));
 			String out = tki.getLogContents();
 			tki.resetLog();
 			if(out.isEmpty()){
-				TkIrc.toIrc.sendMessage(nick, "Executed succesfully, but got no return.");
+				TkIrc.toIrc.sendMessage(Channel, "Executed succesfully, but got no return.");
 			}else{
-				TkIrc.toIrc.sendMessage(nick, out);
+				TkIrc.toIrc.sendMessage(Channel, out);
 			}
 			return;
 		}
-		if (m.startsWith("tusercommands") && isAuthed(usr,nick)) {
+		if (m.startsWith("tusercommands") && isAuthed(usernames,Channel)) {
 			if(Config.IsUserCommandsEnabled){Config.IsUserCommandsEnabled = false;}else{Config.IsUserCommandsEnabled = true;}
-			TkIrc.toIrc.sendNotice(nick, "Toggled user commands to "+Config.IsUserCommandsEnabled);
+			TkIrc.toIrc.sendNotice(Channel, "Toggled user commands to "+Config.IsUserCommandsEnabled);
 			return;
 		}
-		if (m.startsWith("tachievements") && isAuthed(usr,nick)) {
+		if (m.startsWith("tachievements") && isAuthed(usernames,Channel)) {
 			if(Config.Achievements){Config.Achievements = false;}else{Config.Achievements = true;}
-			TkIrc.toIrc.sendNotice(nick, "Toggled Achievements to "+Config.Achievements);
+			TkIrc.toIrc.sendNotice(Channel, "Toggled Achievements to "+Config.Achievements);
 			return;
 		}
 		if (m.startsWith("status")) {
-			TkIrc.toIrc.sendMessage(nick, TkIrc.toIrc.getrawurle());
+			TkIrc.toIrc.sendMessage(Channel, TkIrc.toIrc.getrawurle());
 			return;
 		}
 		if (m.startsWith("help") && m.length() == 4) {
 	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| base64| moddir| rainbow| ";
-		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| tUserCommands| tAchievements| ";}
+		 if (isAuthed(usernames, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| tUserCommands| tAchievements| ";}
 		 Iterator<String> commands = TkIrc.commands.keySet().iterator();
 	 	 while (commands.hasNext()){
 			String current = commands.next();
 			if(msgb.length() <= 400){
 			  msgb = msgb+current+"| ";
 			 }else{
-				 TkIrc.toIrc.sendNotice(usr, msgb);
+				 TkIrc.toIrc.sendNotice(usernames, msgb);
 				 msgb = "";
 			 }
 		    }
-		 TkIrc.toIrc.sendNotice(usr, msgb);
+		 TkIrc.toIrc.sendNotice(usernames, msgb);
 		 return;
 		}else if(m.startsWith("help") && m.length() >= 5){
 			m = m.substring(5).toLowerCase();
 			if(m.startsWith("help")){
-				TkIrc.toIrc.sendNotice(usr, "help: Display list of commands currently served by this server.");
+				TkIrc.toIrc.sendNotice(usernames, "help: Display list of commands currently served by this server.");
 			}else if(m.startsWith("players")){
-				TkIrc.toIrc.sendNotice(usr, "players: List all players currently on server, by username.");
+				TkIrc.toIrc.sendNotice(usernames, "players: List all players currently on server, by username.");
 			}else if(m.startsWith("status")){
-				TkIrc.toIrc.sendNotice(usr, "status: Parse all of mojangs services and output non working services.");
+				TkIrc.toIrc.sendNotice(usernames, "status: Parse all of mojangs services and output non working services.");
 			}else if(m.startsWith("tps")){
-				TkIrc.toIrc.sendNotice(usr, "tps: Show the tick per second on all worlds, or just the number provided");
+				TkIrc.toIrc.sendNotice(usernames, "tps: Show the tick per second on all worlds, or just the number provided");
 			}else if(m.startsWith("base64")){
-				TkIrc.toIrc.sendNotice(usr, "base64: Command converts input to base64, this module is used in sasl, but can also be used here.");
+				TkIrc.toIrc.sendNotice(usernames, "base64: Command converts input to base64, this module is used in sasl, but can also be used here.");
 			}else if(m.startsWith("moddir")){
-				TkIrc.toIrc.sendNotice(usr, "moddir: List all currently loaded forgemods, in notice.");
+				TkIrc.toIrc.sendNotice(usernames, "moddir: List all currently loaded forgemods, in notice.");
 			}else if(m.startsWith("rainbow")){
-				TkIrc.toIrc.sendNotice(usr, "rainbow: Command adds random colors to input text.");
+				TkIrc.toIrc.sendNotice(usernames, "rainbow: Command adds random colors to input text.");
 			}else if(m.startsWith("set")){
-				TkIrc.toIrc.sendNotice(usr, "set: Set a response to a phrase, in the format set <command> <reply>");
+				TkIrc.toIrc.sendNotice(usernames, "set: Set a response to a phrase, in the format set <command> <reply>");
 			}else if(m.startsWith("unset")){
-				TkIrc.toIrc.sendNotice(usr, "unset: Remove a response to a phrase from the database, unset <command>");
+				TkIrc.toIrc.sendNotice(usernames, "unset: Remove a response to a phrase from the database, unset <command>");
 			}else if(m.startsWith("c")){
-				TkIrc.toIrc.sendNotice(usr, "c: Execute a minecraft command as the server.");
+				TkIrc.toIrc.sendNotice(usernames, "c: Execute a minecraft command as the server.");
 			}else if(m.startsWith("fakecrash")){
-				TkIrc.toIrc.sendNotice(usr, "fakecrash: Make a crashfile in the crashreports dir, then print a message.");
+				TkIrc.toIrc.sendNotice(usernames, "fakecrash: Make a crashfile in the crashreports dir, then print a message.");
 			}else if(m.startsWith("tusercommands")){
-				TkIrc.toIrc.sendNotice(usr, "tUserCommands: Toggle users ability to use the (irc)server commands.");
+				TkIrc.toIrc.sendNotice(usernames, "tUserCommands: Toggle users ability to use the (irc)server commands.");
 			}else if(m.startsWith("tcchievements")){
-				TkIrc.toIrc.sendNotice(usr, "tAchievements: Toggle achievements announcements on irc.");
+				TkIrc.toIrc.sendNotice(usernames, "tAchievements: Toggle achievements announcements on irc.");
 			}
 			return;
 		}
 		if(m.startsWith("base64") && m.length() > 8){
-			TkIrc.toIrc.sendMessage(nick, Base64.encode(m.substring(7)));
+			TkIrc.toIrc.sendMessage(Channel, Base64.encode(m.substring(7)));
 			return;
 		}
 		if(m.startsWith("moddir")){
 			String rawData = TkIrc.combinedModList();
 			if(rawData.length() <= 400){
-				TkIrc.toIrc.sendNotice(nick, rawData);
+				TkIrc.toIrc.sendNotice(Channel, rawData);
 			}else{
 				String[] rowData = rawData.split("(?<=\\G.{400})");
 				for (String Packet: rowData){
-					TkIrc.toIrc.sendNotice(nick, Packet);
+					TkIrc.toIrc.sendNotice(Channel, Packet);
 				}
 			}
 			return;
 		}
 		if(m.startsWith("rainbow") && m.length() > 8){
-			TkIrc.toIrc.sendMessage(nick, colorRainbow(m.substring(8)));
+			TkIrc.toIrc.sendMessage(Channel, colorRainbow(m.substring(8)));
 			return;
 		}
 		if (m.startsWith("tps")) {
@@ -239,10 +241,10 @@ public class IRCBot extends IRCLib implements API {
 										.getDimensionName() });
 				if (!m.substring(3).isEmpty()) {
 					if (equals) {
-						TkIrc.toIrc.sendMessage(nick, outToPlayer);
+						TkIrc.toIrc.sendMessage(Channel, outToPlayer);
 					}
 				} else {
-					TkIrc.toIrc.sendMessage(nick, outToPlayer);
+					TkIrc.toIrc.sendMessage(Channel, outToPlayer);
 				}
 			}
 
@@ -253,12 +255,12 @@ public class IRCBot extends IRCLib implements API {
 							percentFormatter.format(tps / 20.0D),
 							Double.valueOf(totalTickTime) });
 			if (!wasInt || !equalz) {
-				TkIrc.toIrc.sendMessage(nick, out1);
+				TkIrc.toIrc.sendMessage(Channel, out1);
 			}
 			return;
 		}
-		if (m.startsWith("fakecrash") && isAuthed(usr,nick)){
-			TkIrc.FakeCrash(nick);
+		if (m.startsWith("fakecrash") && isAuthed(usernames,Channel)){
+			TkIrc.FakeCrash(Channel);
 			return;
 		}
 		String[] commandsplit = m.split(" ", 3);
@@ -266,30 +268,30 @@ public class IRCBot extends IRCLib implements API {
 			String mesig = commandsplit[0];
 			if (TkIrc.commands.containsKey(mesig)) {
 				
-				TkIrc.toIrc.sendMessage(nick, TkIrc.commands.get(mesig));
+				TkIrc.toIrc.sendMessage(Channel, TkIrc.commands.get(mesig));
 				return;
 			}
 			if (m.startsWith("unset")
-					&& commandsplit[1] != null && isAuthed(usr,nick)) {
+					&& commandsplit[1] != null && isAuthed(usernames,Channel)) {
 				if (TkIrc.commands.get(commandsplit[1]) != null) {
 					TkIrc.commands.remove(commandsplit[1]);
-					TkIrc.toIrc.sendMessage(nick, "removed " + commandsplit[1]);
+					TkIrc.toIrc.sendMessage(Channel, "removed " + commandsplit[1]);
 					TkIrc.toIrc.savecmd();
 				} else {
-					TkIrc.toIrc.sendMessage(nick,
+					TkIrc.toIrc.sendMessage(Channel,
 							"Command to be removed not found");
 				}
 				return;
 			}
-			if (m.startsWith("set") && commandsplit[2] != null && commandsplit[1] != null && isAuthed(usr,nick)) {
+			if (m.startsWith("set") && commandsplit[2] != null && commandsplit[1] != null && isAuthed(usernames,Channel)) {
 				
 				TkIrc.commands.put(commandsplit[1].toLowerCase(),commandsplit[2]);
-				TkIrc.toIrc.sendNotice(usr, "Set " + commandsplit[1] + " as "+ commandsplit[2]);
+				TkIrc.toIrc.sendNotice(usernames, "Set " + commandsplit[1] + " as "+ commandsplit[2]);
 				TkIrc.toIrc.savecmd();
 				return;
 			}
 		} catch (IndexOutOfBoundsException e) {
-			TkIrc.toIrc.sendMessage(nick, "Invalid command format");
+			TkIrc.toIrc.sendMessage(Channel, "Invalid command format");
 			return;
 		}
 	}

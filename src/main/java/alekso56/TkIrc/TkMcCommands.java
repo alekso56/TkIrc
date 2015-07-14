@@ -37,11 +37,13 @@ public class TkMcCommands extends CommandBase
 	}
 	@Override
 	public void processCommand(ICommandSender icommandsender, String[] astring) {
-		if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect")); return;}
+		if (astring.length < 1) { icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect, tusercommands")); return;}
 		if (astring[0].equalsIgnoreCase("reconnect")) {
 			TkIrc.reconnectBot(false);
+		}else if(astring[0].equalsIgnoreCase("reconnect")){
+			if(Config.IsUserCommandsEnabled){Config.IsUserCommandsEnabled = false;}else{Config.IsUserCommandsEnabled = true;}
 		}
 		else if ((astring[0].equalsIgnoreCase("help")) && (astring.length > 0)) {
-			icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect")); }
+			icommandsender.addChatMessage(new ChatComponentText("Commands: reconnect, tusercommands")); }
 	}
 }

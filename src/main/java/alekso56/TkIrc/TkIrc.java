@@ -64,12 +64,7 @@ public class TkIrc {
 	
 	public static void reconnectBot(boolean init){
 		if(!init){
-		try {
 			TkIrc.toIrc.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 		}
 		toIrc = new IRCBot();
 		toIrc.initialTimer();
@@ -90,7 +85,7 @@ public class TkIrc {
 						Config.botName, Config.sKey);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("failed connecting to server");
 		}
 	}
 
