@@ -45,9 +45,9 @@ public class TkIrc {
 		if (!Config.enabled) {
 			return;
 		}
-		 event.registerServerCommand(new TkHQ());
+		 event.registerServerCommand(new TkMcCommands());
 		 MinecraftForge.EVENT_BUS.register(new TkEvents());
-		 FMLCommonHandler.instance().bus().register(new playerlogs());
+		 FMLCommonHandler.instance().bus().register(new PlayerLoginout());
 		 toIrc.joinChannel(Config.cName, Config.cKey);
 	}
 

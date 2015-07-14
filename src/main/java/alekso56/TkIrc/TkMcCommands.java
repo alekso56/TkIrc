@@ -7,7 +7,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
-public class TkHQ extends CommandBase
+public class TkMcCommands extends CommandBase
 {
 
 	@Override

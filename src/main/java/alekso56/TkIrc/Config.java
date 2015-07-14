@@ -19,6 +19,7 @@ public class Config {
 	static boolean enabled;
 	static boolean Achievements;
 	static boolean depinger;
+	static boolean IsUserCommandsEnabled;
 	static boolean scoreboardColors;
 	static String botName;
 	static String opColor;
@@ -51,6 +52,7 @@ public class Config {
 				"e").comment = "Color code for OPs on your server. r = no color. Uses minecraft colors";
 		enabled = config.get("general", "ircEnabled", false).getBoolean(false);
 		Achievements = config.get("general", "AchievementsEnabled", true).getBoolean(true);
+		IsUserCommandsEnabled = config.get("general", "IsUserCommandsEnabled", true).getBoolean(true);
 		scoreboardColors = config.get("general", "ScoreboardColorsInIRCMSGS", false).getBoolean(false);
 
 		sHost = config.get("Server", "hostname", "irc.esper.net").getString();

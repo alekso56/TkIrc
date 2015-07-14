@@ -2,6 +2,7 @@ package alekso56.TkIrc;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Iterator;
 
 import alekso56.TkIrc.irclib.Base64;
@@ -13,11 +14,9 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.DimensionManager;
-import java.util.Date;
 
 public class IRCBot extends IRCLib implements API {
 	private static final String bs = Character.toString('\u00A7');
-	private static boolean isUserCommandsEnabled = true;
 	private double timeFormat(long[] par1ArrayOfLong) {
 		long time = 0L;
 		long[] var4 = par1ArrayOfLong;
@@ -67,7 +66,7 @@ public class IRCBot extends IRCLib implements API {
 			}
 		}
 		if (nick != null) {
-			TkIrc.toIrc.sendMessage(nick, "ACCESS DENIED!: not authorized");
+			TkIrc.toIrc.sendMessage(nick, "You are unauthorized.");
 		}
 		return false;
 	}
@@ -85,33 +84,57 @@ public class IRCBot extends IRCLib implements API {
 			return;
 		}
 		else{m = m.substring(Config.prefixforirccommands.length());}
+		m = m.toLowerCase();
 		
-		
-	    if(!isUserCommandsEnabled){if(!isAuthed(usr,nick)){return;}}
+	    if(!Config.IsUserCommandsEnabled){if(!isAuthed(usr,nick)){return;}}
 
 		if (m.startsWith("players") && (Side.SERVER == FMLCommonHandler.instance().getSide())) {
 			String[] aPlayers = MinecraftServer.getServer().getAllUsernames();
 			String lPlayers = aPlayers.length == 0 ? "None." : "";
-
+            if(aPlayers.length < 50){
 			for (String sPlayer : aPlayers) {
 				sPlayer = Scoreboard(sPlayer, false);
 				lPlayers = lPlayers + ((lPlayers == "") ? sPlayer : new StringBuilder()
 								.append(", ").append(sPlayer).toString());
 			}
-			TkIrc.toIrc.sendMessage(nick, lPlayers);
+			 if(lPlayers.length() <= 400){
+			     TkIrc.toIrc.sendMessage(nick, lPlayers);}
+			 else{
+				 int last = 0;
+					for (int i = 0; i < lPlayers.length();)
+					{
+						if (lPlayers.charAt(i) == ',')
+						{
+							last = i;
+							i += 400;
+							TkIrc.toIrc.sendNotice(nick, lPlayers.substring(last, i));	
+						}
+					}
+			 }
+            }else{
+             TkIrc.toIrc.sendMessage(nick, "Too many players present.");
+            }
 			return;
 		}
-		if (m.toLowerCase().startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 ) {
-					String out = MinecraftServer.getServer().handleRConCommand(m.substring(1));
-					TkIrc.toIrc.sendMessage(nick, out);
+		if (m.startsWith("c ")&&isAuthed(usr,nick)&&m.length() >=  2 && !m.substring(1).startsWith("me")) {
+			TkIrcCommandsender tki = new TkIrcCommandsender();
+			tki.resetLog();
+			MinecraftServer.getServer().getCommandManager().executeCommand(tki, m.substring(1));
+			String out = tki.getLogContents();
+			tki.resetLog();
+			if(out.isEmpty()){
+				TkIrc.toIrc.sendMessage(nick, "Executed succesfully, but got no return.");
+			}else{
+				TkIrc.toIrc.sendMessage(nick, out);
+			}
 			return;
 		}
-		if (m.startsWith("tUserCommands") && isAuthed(usr,nick)) {
-			if(isUserCommandsEnabled){isUserCommandsEnabled = false;}else{isUserCommandsEnabled = true;}
-			TkIrc.toIrc.sendNotice(nick, "Toggled user commands to "+isUserCommandsEnabled);
+		if (m.startsWith("tusercommands") && isAuthed(usr,nick)) {
+			if(Config.IsUserCommandsEnabled){Config.IsUserCommandsEnabled = false;}else{Config.IsUserCommandsEnabled = true;}
+			TkIrc.toIrc.sendNotice(nick, "Toggled user commands to "+Config.IsUserCommandsEnabled);
 			return;
 		}
-		if (m.startsWith("tAchievements") && isAuthed(usr,nick)) {
+		if (m.startsWith("tachievements") && isAuthed(usr,nick)) {
 			if(Config.Achievements){Config.Achievements = false;}else{Config.Achievements = true;}
 			TkIrc.toIrc.sendNotice(nick, "Toggled Achievements to "+Config.Achievements);
 			return;
@@ -120,25 +143,77 @@ public class IRCBot extends IRCLib implements API {
 			TkIrc.toIrc.sendMessage(nick, TkIrc.toIrc.getrawurle());
 			return;
 		}
-		if (m.startsWith("help")) {
+		if (m.startsWith("help") && m.length() == 4) {
 	     String msgb = "Prefix: "+Config.prefixforirccommands+" help| players| status| tps <t or worldNum>| base64| moddir| rainbow| ";
 		 if (isAuthed(usr, null)){msgb = msgb+"set <command> <reply>| unset <command>| c <mcCommand>| fakecrash| tUserCommands| tAchievements| ";}
 		 Iterator<String> commands = TkIrc.commands.keySet().iterator();
 	 	 while (commands.hasNext()){
 			String current = commands.next();
-			 msgb = msgb+current+"| ";
+			if(msgb.length() <= 400){
+			  msgb = msgb+current+"| ";
+			 }else{
+				 TkIrc.toIrc.sendNotice(usr, msgb);
+				 msgb = "";
+			 }
 		    }
 		 TkIrc.toIrc.sendNotice(usr, msgb);
 		 return;
+		}else if(m.startsWith("help") && m.length() >= 5){
+			m = m.substring(5).toLowerCase();
+			if(m.startsWith("help")){
+				TkIrc.toIrc.sendNotice(usr, "help: Display list of commands currently served by this server.");
+			}else if(m.startsWith("players")){
+				TkIrc.toIrc.sendNotice(usr, "players: List all players currently on server, by username.");
+			}else if(m.startsWith("status")){
+				TkIrc.toIrc.sendNotice(usr, "status: Parse all of mojangs services and output non working services.");
+			}else if(m.startsWith("tps")){
+				TkIrc.toIrc.sendNotice(usr, "tps: Show the tick per second on all worlds, or just the number provided");
+			}else if(m.startsWith("base64")){
+				TkIrc.toIrc.sendNotice(usr, "base64: Command converts input to base64, this module is used in sasl, but can also be used here.");
+			}else if(m.startsWith("moddir")){
+				TkIrc.toIrc.sendNotice(usr, "moddir: List all currently loaded forgemods, in notice.");
+			}else if(m.startsWith("rainbow")){
+				TkIrc.toIrc.sendNotice(usr, "rainbow: Command adds random colors to input text.");
+			}else if(m.startsWith("set")){
+				TkIrc.toIrc.sendNotice(usr, "set: Set a response to a phrase, in the format set <command> <reply>");
+			}else if(m.startsWith("unset")){
+				TkIrc.toIrc.sendNotice(usr, "unset: Remove a response to a phrase from the database, unset <command>");
+			}else if(m.startsWith("c")){
+				TkIrc.toIrc.sendNotice(usr, "c: Execute a minecraft command as the server.");
+			}else if(m.startsWith("fakecrash")){
+				TkIrc.toIrc.sendNotice(usr, "fakecrash: Make a crashfile in the crashreports dir, then print a message.");
+			}else if(m.startsWith("tusercommands")){
+				TkIrc.toIrc.sendNotice(usr, "tUserCommands: Toggle users ability to use the (irc)server commands.");
+			}else if(m.startsWith("tcchievements")){
+				TkIrc.toIrc.sendNotice(usr, "tAchievements: Toggle achievements announcements on irc.");
+			}
+			return;
 		}
 		if(m.startsWith("base64") && m.length() > 8){
 			TkIrc.toIrc.sendMessage(nick, Base64.encode(m.substring(7)));
+			return;
 		}
 		if(m.startsWith("moddir")){
-			TkIrc.toIrc.sendNotice(nick, TkIrc.combinedModList());
+			String rawData = TkIrc.combinedModList();
+			if(rawData.length() <= 400){
+				TkIrc.toIrc.sendNotice(nick, rawData);
+			}else{
+				int last = 0;
+				for (int i = 0; i < rawData.length();)
+				{
+					if (rawData.charAt(i) == ',')
+					{
+						last = i;
+						i += 400;
+						TkIrc.toIrc.sendNotice(nick, rawData.substring(last, i));	
+					}
+				}
+			}
+			return;
 		}
 		if(m.startsWith("rainbow") && m.length() > 8){
 			TkIrc.toIrc.sendMessage(nick, colorRainbow(m.substring(8)));
+			return;
 		}
 		if (m.startsWith("tps")) {
 			StringBuilder out = new StringBuilder();
@@ -154,9 +229,7 @@ public class IRCBot extends IRCLib implements API {
 				Boolean equals = false;
 				totalTickTime += tickTime;
 				try {
-					equals = equalz
-							&& id.equals(Integer
-									.parseInt(m.substring(3).trim()));
+					equals = equalz && id.equals(Integer.parseInt(m.substring(3).trim()));
 					wasInt = true;
 				} catch (NumberFormatException e) {
 				}

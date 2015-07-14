@@ -6,7 +6,7 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.relauncher.Side;
 
-public class playerlogs {
+public class PlayerLoginout {
     @SubscribeEvent
     public void onPlayerLogin(PlayerLoggedInEvent player) {
         if (Side.CLIENT == FMLCommonHandler.instance().getSide()) {
