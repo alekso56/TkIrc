@@ -198,15 +198,9 @@ public class IRCBot extends IRCLib implements API {
 			if(rawData.length() <= 400){
 				TkIrc.toIrc.sendNotice(nick, rawData);
 			}else{
-				int last = 0;
-				for (int i = 0; i < rawData.length();)
-				{
-					if (rawData.charAt(i) == ',')
-					{
-						last = i;
-						i += 400;
-						TkIrc.toIrc.sendNotice(nick, rawData.substring(last, i));	
-					}
+				String[] rowData = rawData.split("(?<=\\G.{400})");
+				for (String Packet: rowData){
+					TkIrc.toIrc.sendNotice(nick, Packet);
 				}
 			}
 			return;
